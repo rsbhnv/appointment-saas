@@ -1,0 +1,63 @@
+---
+description: Security-first coding rules — secrets, validation, tenant isolation, RBAC
+alwaysApply: true
+---
+
+# Security Rules
+
+Inspired by [matank001/cursor-security-rules](https://github.com/matank001/cursor-security-rules). Security takes precedence over convenience.
+
+## Never expose secrets to the client
+
+- `NEXT_PUBLIC_*` is the **only** env prefix allowed in client bundles.
+- Service-role / admin / signing keys go through `src/lib/env/server.ts` and must be imported only from modules that `import "server-only"`.
+- Never log, print, or interpolate a secret into a response body, error message, or client-visible string.
+
+```ts
+// BAD — leaks server secret into client bundle
+export const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// GOOD — server-only access
+import "server-only";
+import { serverEnv } from "@/lib/env/server";
+const key = serverEnv.SUPABASE_SERVICE_ROLE_KEY;
+```
+
+## All sensitive logic runs server-side
+
+- Authentication, authorization, billing, tenant provisioning, webhook handling: **Server Actions / Route Handlers only**.
+- Never trust a `tenant_id`, `userId`, or role flag sent from the client — re-derive from the session on every call.
+
+## Validate every input at the server boundary
+
+- Parse with Zod (or equivalent) at the entry of every Server Action and Route Handler.
+- Reject extra fields; do not pass raw request bodies into queries.
+
+```ts
+const Input = z.object({ slug: z.string().min(1).max(64) });
+export async function action(formData: FormData) {
+  const { slug } = Input.parse(Object.fromEntries(formData));
+  // ...
+}
+```
+
+## Tenant isolation is mandatory
+
+- Every tenant-scoped query must filter by `tenant_id` resolved from the session, never from the URL alone.
+- Enforce the same constraint in Supabase RLS as a second line of defense.
+- Cross-tenant operations require a distinct platform-admin role and audit logging.
+
+## Role-based access control (default deny)
+
+- Check permissions on every server entry point — do not rely solely on UI hiding controls.
+- Centralize role checks; do not scatter `if (role === "admin")` across routes.
+
+## No unsafe terminal commands without explanation
+
+When proposing shell commands, especially destructive (`rm -rf`, `DROP`, `--force`, `migrate reset`) or that touch secrets/auth, always:
+
+1. State **what** the command does.
+2. State **why** it is needed now.
+3. State **what it changes irreversibly**.
+
+Never paste a one-liner that mutates state without that context.

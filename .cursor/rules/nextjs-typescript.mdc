@@ -1,0 +1,55 @@
+---
+description: Next.js App Router + clean TypeScript conventions
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Next.js + TypeScript
+
+This project uses **Next.js 16 App Router**. APIs and conventions may differ from older Next.js — consult `node_modules/next/dist/docs/` and heed deprecations.
+
+## TypeScript
+
+- Strict mode is on. No `any`, no `@ts-ignore` without a comment justifying it.
+- Prefer `type` for object shapes, `interface` for extensible contracts.
+- Export named functions and types; avoid default exports except for Next.js page/layout/route files.
+- Narrow at the boundary (Zod, type guards). Inside core logic, types should already be precise.
+
+```ts
+// BAD
+export default function f(data: any) { return data.id; }
+
+// GOOD
+type User = { id: string; email: string };
+export function getUserId(user: User): string { return user.id; }
+```
+
+## Server vs client
+
+- Components are Server Components by default. Add `"use client"` only when you need state, effects, or browser APIs.
+- Data fetching belongs in Server Components, Server Actions, or Route Handlers — not in client `useEffect`.
+- Never import a `server-only` module from a Client Component.
+
+## File and folder conventions
+
+- App routes: `src/app/(group)/segment/page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`.
+- Route Handlers: `src/app/api/.../route.ts` — export `GET`/`POST`/etc.
+- Shared logic: `src/lib/<domain>/`. Shared types: `src/types/`.
+- Reusable hooks: `src/hooks/`. Server Actions: `src/server/actions/`.
+
+## Reusable code
+
+- Extract a component or hook the second time you copy logic.
+- Co-locate small helpers with their consumer; promote to `src/lib/` when reused across features.
+- Keep components small (under ~150 lines) and single-purpose.
+
+## Naming — generic SaaS only
+
+- Never bake clinic/medical/appointment-specific terms into infrastructure or shared modules.
+- Use generic SaaS vocabulary: `tenant`, `member`, `resource`, `schedule`, `booking`, `customer`.
+- Bad: `clinicId`, `doctorService`, `patientList`. Good: `tenantId`, `providerService`, `customerList`.
+
+## Errors
+
+- Throw typed errors from server code; convert to safe responses at the boundary.
+- Never swallow errors silently. If catching to recover, log with context.

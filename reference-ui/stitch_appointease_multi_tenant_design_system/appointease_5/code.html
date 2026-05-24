@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="he"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#5f5c6f",
+                        "tertiary-fixed": "#e6deff",
+                        "on-tertiary-container": "#eee7ff",
+                        "secondary-container": "#e2ddf3",
+                        "background": "#fcf8ff",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c9c4d7",
+                        "primary-fixed-dim": "#cabeff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#4720c2",
+                        "inverse-on-surface": "#f3eeff",
+                        "surface-variant": "#e4dfff",
+                        "surface-bright": "#fcf8ff",
+                        "inverse-primary": "#cabeff",
+                        "on-background": "#1b1931",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#302e47",
+                        "primary": "#5230cd",
+                        "tertiary": "#5342a1",
+                        "on-surface-variant": "#484555",
+                        "secondary-fixed": "#e4e0f6",
+                        "primary-container": "#6b4ee6",
+                        "on-secondary-container": "#636073",
+                        "on-primary-fixed": "#1b0062",
+                        "on-tertiary-fixed": "#1c0062",
+                        "surface-container-highest": "#e4dfff",
+                        "surface-container-high": "#eae5ff",
+                        "on-tertiary-fixed-variant": "#483695",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#cabeff",
+                        "on-primary-container": "#eee7ff",
+                        "outline": "#797586",
+                        "surface-dim": "#dbd6f7",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#1b1a2a",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f6f1ff",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#e6deff",
+                        "on-surface": "#1b1931",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#5f41da",
+                        "secondary-fixed-dim": "#c8c4da",
+                        "on-secondary-fixed-variant": "#474557",
+                        "surface-container": "#f0ebff",
+                        "tertiary-container": "#6c5bbb",
+                        "surface": "#fcf8ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "sm": "12px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "lg": "40px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Rubik"],
+                        "headline-lg-mobile": ["Rubik"],
+                        "display-lg": ["Rubik"],
+                        "headline-lg": ["Rubik"],
+                        "title-md": ["Rubik"],
+                        "label-sm": ["Rubik"],
+                        "body-lg": ["Rubik"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "700"}],
+                        "title-md": ["20px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600"}],
+                        "label-sm": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Rubik', sans-serif; background-color: #fcf8ff; }
+        .purple-shadow-sm { shadow: 0px 4px 12px rgba(107, 78, 230, 0.08); }
+        .purple-shadow-md { shadow: 0px 12px 32px rgba(107, 78, 230, 0.12); }
+        .accent-bar { width: 4px; border-radius: 0 4px 4px 0; }
+        .glass-nav { background: rgba(252, 248, 255, 0.8); backdrop-filter: blur(12px); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background">
+<!-- Top Navigation Bar (Mobile only) -->
+<header class="md:hidden glass-nav sticky top-0 z-50 flex flex-row-reverse justify-between items-center h-[60px] px-margin-mobile w-full border-b border-outline-variant/30">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">menu</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">AppointEase</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="A professional business logo for a high-end salon, featuring elegant typography and minimalist geometric shapes. The lighting is bright and clean, mimicking a professional studio setting. The color palette is dominated by soft lavenders and deep purples, reflecting a modern, sophisticated aesthetic that is consistent with a luxury scheduling application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiP0tWJHvCA3xwjqMBMA5H_BFLqfgX0AEPuGouGlwrhUw8ILMLfixKkjl9bFcXlCEf_xtT4ftw36yiwIgTO5GFM2jUex-n5LW3l0KVxGXVb7VQwA1MMhfkRbwQ4P09MeP8neunqeYfo3OPzLgOT93KLMOz839Tq7e63rZcYMJ42WJdWtHfcywErR5zcs5yIue4109O33OmFixaWeCpXjKNN7xNcb70nu2dTU6HaWAUg-o96cRrRifyct3WPQiacLhwUjsyzIu-0xc"/>
+</div>
+</header>
+<div class="flex min-h-screen">
+<!-- Persistent Side Navigation (Desktop) -->
+<aside class="hidden md:flex fixed inset-y-0 right-0 z-[60] flex flex-col p-md text-right bg-surface w-[280px] shadow-[0px_12px_32px_rgba(107,78,230,0.12)] rounded-l-xl">
+<div class="mb-lg px-sm">
+<span class="font-headline-lg text-headline-lg font-bold text-primary">AppointEase</span>
+</div>
+<div class="flex flex-row-reverse items-center gap-sm mb-lg bg-surface-container-low p-sm rounded-xl">
+<div class="text-right flex-1">
+<p class="font-title-md text-title-md text-on-surface">ישראל ישראלי</p>
+<p class="font-body-md text-body-md text-on-surface-variant">מספרת העיר</p>
+<p class="font-label-sm text-label-sm text-primary font-bold">אדמין</p>
+</div>
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="User" class="w-full h-full object-cover" data-alt="A high-quality, professional headshot of a middle-aged male business owner with a friendly and approachable expression. The man is set against a soft-focus office background that conveys a professional yet warm corporate environment. The lighting is natural and even, highlighting the clean and modern look of the AppointEase platform's user profile section." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgZicJ3O1zZeqDtf4xeNEN1mMkj40WpGVirD2r745NWddU1daUFvXT3n1OWubgocyYcdtMDyXO8IAQ8eTMBdO4higswmw9WleOqj502ygV3KklLUE0hYqnq_UXtu6uQKpHFDkYhsOp0l6jvVlA-qu_HltfO2ULrZJPOMAIkfqQf7YvhsUOe8kyKMgZqyzwfgA2BYY69oS3rYJR1bJaYwSOSv7M-VV3LDdpBjNJGY-MMSmHTu-B4eniC2-cGyZQVyFwWxM01WKMQl0"/>
+</div>
+</div>
+<nav class="flex flex-col gap-xs">
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">לוח בקרה</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-body-md text-body-md">תורים</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">לקוחות</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm bg-primary-container text-on-primary-container rounded-lg p-sm shadow-sm transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-body-md text-body-md font-bold">שירותים</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">הגדרות</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:mr-[280px] p-margin-mobile md:p-margin-desktop pb-32">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-md mb-xl">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-background">שירותים</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">נהל את קטלוג השירותים והמחירים שלך</p>
+</div>
+<button class="bg-primary hover:bg-primary-container text-white px-md py-sm rounded-lg flex items-center gap-xs transition-all shadow-[0px_4px_12px_rgba(107,78,230,0.2)] active:scale-95">
+<span class="material-symbols-outlined">add</span>
+<span class="font-label-sm text-label-sm">הוסף שירות</span>
+</button>
+</div>
+<!-- Services Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Service Card 1 -->
+<div class="relative bg-white rounded-xl p-md flex flex-row-reverse gap-md shadow-[0px_4px_12px_rgba(107,78,230,0.08)] border border-outline-variant/10 hover:shadow-[0px_12px_32px_rgba(107,78,230,0.12)] transition-shadow">
+<div class="accent-bar bg-primary absolute right-0 top-md bottom-md"></div>
+<div class="flex-1 text-right">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-title-md text-title-md text-on-surface font-bold">תספורת גברים קלאסית</h3>
+<div class="flex items-center gap-sm">
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:bg-secondary-fixed/30 transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="flex flex-wrap flex-row-reverse gap-x-md gap-y-xs text-on-surface-variant font-label-sm text-label-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>60 דק׳</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+<span>₪120</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">hourglass_empty</span>
+<span>buffer 10 דק׳</span>
+</div>
+</div>
+<div class="mt-md pt-md border-t border-outline-variant/20 flex flex-row-reverse justify-between items-center">
+<div class="flex items-center gap-xs text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>עד 2 לקוחות</span>
+</div>
+<span class="bg-primary-fixed-dim/30 text-on-primary-fixed-variant px-sm py-1 rounded-full font-label-sm text-label-sm">פעיל</span>
+</div>
+</div>
+</div>
+<!-- Service Card 2 -->
+<div class="relative bg-white rounded-xl p-md flex flex-row-reverse gap-md shadow-[0px_4px_12px_rgba(107,78,230,0.08)] border border-outline-variant/10 hover:shadow-[0px_12px_32px_rgba(107,78,230,0.12)] transition-shadow">
+<div class="accent-bar bg-tertiary absolute right-0 top-md bottom-md"></div>
+<div class="flex-1 text-right">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-title-md text-title-md text-on-surface font-bold">עיצוב זקן וטיפוח</h3>
+<div class="flex items-center gap-sm">
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:bg-secondary-fixed/30 transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="flex flex-wrap flex-row-reverse gap-x-md gap-y-xs text-on-surface-variant font-label-sm text-label-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>30 דק׳</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+<span>₪60</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">hourglass_empty</span>
+<span>buffer 5 דק׳</span>
+</div>
+</div>
+<div class="mt-md pt-md border-t border-outline-variant/20 flex flex-row-reverse justify-between items-center">
+<div class="flex items-center gap-xs text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>לקוח 1</span>
+</div>
+<span class="bg-primary-fixed-dim/30 text-on-primary-fixed-variant px-sm py-1 rounded-full font-label-sm text-label-sm">פעיל</span>
+</div>
+</div>
+</div>
+<!-- Service Card 3 -->
+<div class="relative bg-white rounded-xl p-md flex flex-row-reverse gap-md shadow-[0px_4px_12px_rgba(107,78,230,0.08)] border border-outline-variant/10 hover:shadow-[0px_12px_32px_rgba(107,78,230,0.12)] transition-shadow">
+<div class="accent-bar bg-primary absolute right-0 top-md bottom-md"></div>
+<div class="flex-1 text-right">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-title-md text-title-md text-on-surface font-bold">חבילת פרימיום VIP</h3>
+<div class="flex items-center gap-sm">
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:bg-secondary-fixed/30 transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="flex flex-wrap flex-row-reverse gap-x-md gap-y-xs text-on-surface-variant font-label-sm text-label-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>90 דק׳</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+<span>₪250</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">hourglass_empty</span>
+<span>buffer 15 דק׳</span>
+</div>
+</div>
+<div class="mt-md pt-md border-t border-outline-variant/20 flex flex-row-reverse justify-between items-center">
+<div class="flex items-center gap-xs text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>לקוח 1</span>
+</div>
+<span class="bg-primary-fixed-dim/30 text-on-primary-fixed-variant px-sm py-1 rounded-full font-label-sm text-label-sm">פעיל</span>
+</div>
+</div>
+</div>
+<!-- Service Card 4 (Inactive Example) -->
+<div class="relative bg-surface-container-low opacity-75 rounded-xl p-md flex flex-row-reverse gap-md border border-outline-variant/10">
+<div class="accent-bar bg-outline absolute right-0 top-md bottom-md"></div>
+<div class="flex-1 text-right">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-title-md text-title-md text-on-surface-variant font-bold">צביעת שיער</h3>
+<div class="flex items-center gap-sm">
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:bg-secondary-fixed/30 transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="flex flex-wrap flex-row-reverse gap-x-md gap-y-xs text-outline font-label-sm text-label-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>120 דק׳</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+<span>₪180</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">hourglass_empty</span>
+<span>buffer 10 דק׳</span>
+</div>
+</div>
+<div class="mt-md pt-md border-t border-outline-variant/20 flex flex-row-reverse justify-between items-center">
+<div class="flex items-center gap-xs text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>עד 2 לקוחות</span>
+</div>
+<span class="bg-outline-variant/30 text-outline px-sm py-1 rounded-full font-label-sm text-label-sm">לא פעיל</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex flex-row-reverse justify-around items-center h-16 bg-surface dark:bg-inverse-surface border-t border-outline-variant/30 shadow-[0_-4px_12px_rgba(107,78,230,0.08)] pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">בית</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">event_note</span>
+<span class="font-label-sm text-label-sm">תורים</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-bold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-label-sm text-label-sm">שירותים</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">פרופיל</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for active states
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.style.transform = 'scale(0.96)';
+                el.style.transition = 'transform 0.1s ease';
+            });
+            el.addEventListener('mouseup', () => {
+                el.style.transform = 'scale(1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'scale(1)';
+            });
+        });
+
+        // Toggle state logic visualization (cosmetic only)
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const card = e.target.closest('.relative');
+                const statusBadge = card.querySelector('.bg-primary-fixed-dim, .bg-outline-variant');
+                if (!e.target.checked) {
+                    card.classList.add('opacity-75');
+                    if(statusBadge) {
+                        statusBadge.textContent = 'לא פעיל';
+                        statusBadge.className = 'bg-outline-variant/30 text-outline px-sm py-1 rounded-full font-label-sm text-label-sm';
+                    }
+                } else {
+                    card.classList.remove('opacity-75');
+                    if(statusBadge) {
+                        statusBadge.textContent = 'פעיל';
+                        statusBadge.className = 'bg-primary-fixed-dim/30 text-on-primary-fixed-variant px-sm py-1 rounded-full font-label-sm text-label-sm';
+                    }
+                }
+            });
+        });
+    </script>
+</body></html>

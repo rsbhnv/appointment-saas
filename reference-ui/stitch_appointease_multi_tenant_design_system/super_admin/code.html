@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="he"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #0F0E1A;
+            color: #f3eeff;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for the dark admin theme */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0F0E1A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2D2A4A;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A78BFA;
+        }
+        .glass-card {
+            background: #16142B;
+            border: 1px solid rgba(167, 139, 250, 0.1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#A78BFA",
+                        "on-primary": "#1b0062",
+                        "secondary": "#5f5c6f",
+                        "background": "#0F0E1A",
+                        "surface": "#16142B",
+                        "surface-container": "#1D1B36",
+                        "outline": "#797586",
+                        "outline-variant": "rgba(167, 139, 250, 0.1)",
+                        "inverse-surface": "#f3eeff",
+                        "on-surface": "#f3eeff",
+                        "on-surface-variant": "#c9c4d7"
+                    },
+                    "borderRadius": {
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "sm": "12px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "lg": "40px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Rubik"],
+                        "headline-lg": ["Rubik"],
+                        "title-md": ["Rubik"],
+                        "label-sm": ["Rubik"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "title-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "label-sm": ["14px", {"lineHeight": "1.4", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface">
+<!-- Sidebar Navigation -->
+<aside class="fixed inset-y-0 right-0 w-[280px] bg-surface z-[60] flex flex-col p-md text-right border-l border-outline-variant shadow-xl hidden md:flex">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary">AppointEase</h1>
+<p class="text-label-sm font-label-sm text-outline mt-xs tracking-widest uppercase">Platform Control</p>
+</div>
+<nav class="flex-1 space-y-base">
+<!-- Active State: לוח בקרה -->
+<a class="flex flex-row-reverse items-center gap-sm bg-primary/20 text-primary rounded-lg p-sm transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-title-md text-title-md">לוח בקרה</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-title-md text-title-md">עסקים</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="font-title-md text-title-md">סטטיסטיקה</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-title-md text-title-md">פיננסים</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-title-md text-title-md">הגדרות פלטפורמה</span>
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-outline-variant flex flex-row-reverse items-center gap-sm">
+<img alt="Admin" class="w-10 h-10 rounded-full border border-primary/50" data-alt="A professional studio portrait of a high-level executive male with a kind expression. The lighting is dramatic and moody with a subtle purple backlight that complements the dark-mode UI environment. The style is hyper-realistic and high-end corporate photography with a soft focus background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_RQxM3Z80JVa5cs58TJcnmMCJ7e_B3lg-krx-c1euqrD6nfQraOEBHDVuQXn_bsdwb3jbVfv7DmBCerkOGu6Q1KgxGSHqj0j7CHoyljRGSOp804EcibfPtIkxAfpGmMOzgV4gHo2q6Y2QApuNHRRwZLuCoWmxeHrqAWMxgOBjIvKjwcuKzej8RwlvsYM5E32eYXEtdRjx98guUtCHNTwBTKsWhwEFAsI8iRdSgZgSe3DHN4Kqxv75K-kcBGyH1el2UMPEQb0ujI0"/>
+<div class="text-right">
+<p class="font-label-sm text-label-sm font-bold">ישראל ישראלי</p>
+<p class="text-[12px] text-outline">🔐 Super Admin</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:mr-[280px] min-h-screen">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 bg-background/80 backdrop-blur-md h-[64px] px-margin-desktop flex flex-row-reverse justify-between items-center border-b border-outline-variant">
+<div class="flex flex-row-reverse items-center gap-md">
+<h2 class="font-headline-lg text-[24px] font-bold text-on-surface">סקירת פלטפורמה</h2>
+<span class="bg-primary/10 text-primary text-[11px] font-bold px-base py-xs rounded-full border border-primary/30 flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">lock</span>
+                    SUPER ADMIN
+                </span>
+</div>
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-margin-desktop space-y-xl">
+<!-- KPI Row -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="glass-card p-md rounded-xl shadow-[0px_4px_12px_rgba(167,139,250,0.05)] border-r-4 border-r-primary">
+<p class="text-outline font-label-sm text-label-sm mb-xs">עסקים סה״כ</p>
+<div class="flex justify-between items-end">
+<span class="font-headline-lg text-headline-lg text-on-surface">1,284</span>
+<span class="text-primary text-[12px] font-bold flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+                            12%
+                        </span>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl shadow-[0px_4px_12px_rgba(167,139,250,0.05)]">
+<p class="text-outline font-label-sm text-label-sm mb-xs">עסקים פעילים</p>
+<div class="flex justify-between items-end">
+<span class="font-headline-lg text-headline-lg text-on-surface">942</span>
+<span class="text-primary text-[12px] font-bold">73.3%</span>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl shadow-[0px_4px_12px_rgba(167,139,250,0.05)]">
+<p class="text-outline font-label-sm text-label-sm mb-xs">משתמשים</p>
+<div class="flex justify-between items-end">
+<span class="font-headline-lg text-headline-lg text-on-surface">42,105</span>
+<span class="text-primary text-[12px] font-bold flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+                            5.4k
+                        </span>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl shadow-[0px_4px_12px_rgba(167,139,250,0.05)]">
+<p class="text-outline font-label-sm text-label-sm mb-xs">תורים / יום</p>
+<div class="flex justify-between items-end">
+<span class="font-headline-lg text-headline-lg text-on-surface">8,642</span>
+<span class="text-primary text-[12px] font-bold flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">expand_less</span>
+                            +18%
+                        </span>
+</div>
+</div>
+</div>
+<!-- Businesses Table Section -->
+<div class="glass-card rounded-xl overflow-hidden">
+<div class="p-md flex flex-row-reverse justify-between items-center border-b border-outline-variant bg-surface-container/50">
+<h3 class="font-title-md text-title-md">ניהול עסקים במערכת</h3>
+<div class="flex gap-sm">
+<button class="bg-primary text-on-primary px-md py-sm rounded-lg font-label-sm text-label-sm hover:opacity-90 transition-opacity flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">add_business</span>
+                            הוספת עסק ידנית
+                        </button>
+<button class="border border-outline-variant text-on-surface px-md py-sm rounded-lg font-label-sm text-label-sm hover:bg-surface-container transition-colors">
+                            ייצוא דאטה
+                        </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-right">
+<thead class="bg-surface-container/30 text-outline font-label-sm text-label-sm uppercase tracking-wider">
+<tr>
+<th class="px-md py-sm">עסק</th>
+<th class="px-md py-sm">Slug</th>
+<th class="px-md py-sm">תורים סה״כ</th>
+<th class="px-md py-sm text-center">סטטוס</th>
+<th class="px-md py-sm text-center">פעולות</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Table Row 1 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-md py-md">
+<div class="flex flex-row-reverse items-center gap-sm">
+<div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="Barber" class="w-full h-full object-cover" data-alt="A macro photograph of professional silver barber shears laying on a textured dark wood surface. The lighting is focused and artistic with a distinct violet hue in the reflections. The image matches a luxury dark-mode aesthetic with deep contrasts and high-end visual fidelity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaUD2JAc5Rnxz1_8tIj3QOEcEbGQBrzGNbSuIc7et6hcIlg2oamip610VdGrIoIvSGv1HQZoxz4m7uSU7TlPnOY94VLjNWAHjHWFITwSGPTVm23JgbuyscZUjSqc1GYR5YFbd0seQeXsK2T5JjFfpA2C8HJxfLoxngqtK63g9SZnCfX7qbXX4QWzYQoxHyGZ3yFECbFQRhtvudAdQWi2X1NMIYG6TEldXsZlKTgQyrHg-1tSJNIRBZql933gq6UPzSWFdy2Cf3fc8"/>
+</div>
+<div>
+<p class="font-label-sm text-label-sm font-bold text-on-surface">מספרת העיר - תל אביב</p>
+<p class="text-[12px] text-outline">הצטרפות: 12.01.2024</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<code class="font-mono text-[14px] text-primary bg-primary/5 px-xs rounded">barber-city-tlv</code>
+</td>
+<td class="px-md py-md">
+<p class="font-label-sm text-label-sm text-on-surface">1,452</p>
+</td>
+<td class="px-md py-md text-center">
+<span class="inline-flex px-xs py-xs rounded-full bg-green-500/10 text-green-400 text-[11px] font-bold border border-green-500/20 w-24 justify-center">פעיל</span>
+</td>
+<td class="px-md py-md text-center">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Table Row 2 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-md py-md">
+<div class="flex flex-row-reverse items-center gap-sm">
+<div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="Spa" class="w-full h-full object-cover" data-alt="An ultra-minimalist spa setting with smooth basalt stones and a single orchid petal floating in dark water. The lighting is low-key with a cool neon violet glow reflecting off the water's surface. The composition is clean, balanced, and sophisticated, reflecting a premium service brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC809FztSPUU4bmdsJ-8Pmvy9Vw8nX8XYwYreCp15ojbCZiuHZDot44kPiIDlP2D9657CgmpLb7APFmMukn_iWnA9Ckg-RBWvIG8fOaaNHcf5bRZ8cu1n0B1pO5rrbCprdpSxiN2zBsaBHoy3r7kuTsyxi-vXwW_jK7g9DXVHazsl-gjYk295xYQ8X72_N_RJVkpbuo_bCyCZVbG4YmFvFfPHKB_DGC9CNe3yBu5x5xdvCge060OAIrL2fdj_2X2MCNdG19REzd7o"/>
+</div>
+<div>
+<p class="font-label-sm text-label-sm font-bold text-on-surface">ספא הרמוניה</p>
+<p class="text-[12px] text-outline">הצטרפות: 05.02.2024</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<code class="font-mono text-[14px] text-primary bg-primary/5 px-xs rounded">spa-harmony-herzliya</code>
+</td>
+<td class="px-md py-md">
+<p class="font-label-sm text-label-sm text-on-surface">840</p>
+</td>
+<td class="px-md py-md text-center">
+<span class="inline-flex px-xs py-xs rounded-full bg-green-500/10 text-green-400 text-[11px] font-bold border border-green-500/20 w-24 justify-center">פעיל</span>
+</td>
+<td class="px-md py-md text-center">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Table Row 3 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-md py-md">
+<div class="flex flex-row-reverse items-center gap-sm">
+<div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="Clinic" class="w-full h-full object-cover" data-alt="A clean, futuristic medical clinic reception desk. The aesthetic is extremely high-tech with sleek white surfaces and integrated LED lighting in a soft lavender color. The room is spacious and reflects a top-tier healthcare environment with modern minimalist furniture and high-key ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWPV3wDg7Xqb-rWATrjOKSS-3JvGMVzAEgJ3Dk4dFK3GSoRNu5xfugGtGoYQwWXzLY_64--GjIVqIA8EbJQ4VqCU7NpES4rIEoZ5TMpOPKGvjiy5cx85L9Bf6SjUhiYAC905nOPHitu0v9VugmkXwlBD8tiiCuwog54Di6TNF4wdERCpvKCkMw8G0chaui6yO1Mqp_tXZucgFgBDOEtNpRK5hR1rcNlv-mgAelx34bBqzzYxI05h8znNYmj8eF9BRLwMkH4P1qwsc"/>
+</div>
+<div>
+<p class="font-label-sm text-label-sm font-bold text-on-surface">מרפאת שיניים ד״ר לוי</p>
+<p class="text-[12px] text-outline">הצטרפות: 28.02.2024</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<code class="font-mono text-[14px] text-primary bg-primary/5 px-xs rounded">dr-levi-dental</code>
+</td>
+<td class="px-md py-md">
+<p class="font-label-sm text-label-sm text-on-surface">2,110</p>
+</td>
+<td class="px-md py-md text-center">
+<span class="inline-flex px-xs py-xs rounded-full bg-orange-500/10 text-orange-400 text-[11px] font-bold border border-orange-500/20 w-24 justify-center">ממתין לאישור</span>
+</td>
+<td class="px-md py-md text-center">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Table Row 4 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-md py-md">
+<div class="flex flex-row-reverse items-center gap-sm">
+<div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="Gym" class="w-full h-full object-cover" data-alt="A powerful, high-contrast image of a high-end fitness center at night. The equipment is illuminated by neon purple overhead lights. The atmosphere is energetic and ultra-modern, featuring polished steel, rubberized floor textures, and expansive glass walls. The style is industrial-chic with a luxury dark-mode color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1nQR15taFEP3kzpDcm6IHMTdIiNWd6sXwSG4C4Y1t1hEG1sg3EgYPwKW9e92qF440vb0lxTXxZ3K_HnUPrO6Xz8yOTvqH4QQ-nfxoBFjORtGzG8LCwKjUJzeqWuBUgN3TWMw-vSxtTbXYJP0_Qy2VWsG92uWlNCu8crW1DsdPG_ggS808LFxtvR44vbyHZyBlzYzsoDHTgtFkGeXH9Oyyg0cevQS0EgwjYlwYVScjfaNZfxpqjJQlonErFNVZv3YDqDQbiXjcQ-E"/>
+</div>
+<div>
+<p class="font-label-sm text-label-sm font-bold text-on-surface">PowerFit Studio</p>
+<p class="text-[12px] text-outline">הצטרפות: 15.03.2024</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<code class="font-mono text-[14px] text-primary bg-primary/5 px-xs rounded">powerfit-global</code>
+</td>
+<td class="px-md py-md">
+<p class="font-label-sm text-label-sm text-on-surface">5,321</p>
+</td>
+<td class="px-md py-md text-center">
+<span class="inline-flex px-xs py-xs rounded-full bg-red-500/10 text-red-400 text-[11px] font-bold border border-red-500/20 w-24 justify-center">מושעה</span>
+</td>
+<td class="px-md py-md text-center">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-md bg-surface-container/20 flex justify-between items-center text-outline font-label-sm text-label-sm">
+<div class="flex gap-md">
+<button class="hover:text-primary transition-colors flex items-center gap-xs">
+                            הבא
+                            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<div class="flex gap-xs">
+<span class="w-8 h-8 flex items-center justify-center rounded bg-primary text-on-primary font-bold">1</span>
+<span class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container transition-colors">2</span>
+<span class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container transition-colors">3</span>
+</div>
+<button class="hover:text-primary transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                            הקודם
+                        </button>
+</div>
+<p>מציג 4 מתוך 1,284 עסקים</p>
+</div>
+</div>
+<!-- Visual Asset Section (Asymmetric / Bento-like) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter h-[300px]">
+<div class="md:col-span-2 glass-card rounded-xl relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent z-10"></div>
+<img class="absolute inset-0 w-full h-full object-cover grayscale opacity-30 group-hover:opacity-50 transition-opacity duration-700" data-alt="A series of complex financial data charts and analytical dashboards displayed on multiple high-resolution screens. The room is dark, creating a high-stakes command center feel. Soft purple light glows from the edges of the screens, casting highlights on minimalist office furniture. The overall aesthetic is one of powerful technological oversight and data-driven precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE8aG4HjU9iI2GVvNP-XF-WavqUVeQKrYlvO4c3JpaSIbWztKJ9EP61cQKMGPDqpPMi6BEUHksDA_Or6ezJyq5qEueMColm8kTtE050anQlQAnOyexNVtmgNuivq_RFzBRem0u9w8XQE4IWjmFjw77xBp25plodI9IasOJsxeGdDW4VAMh6lx5zK1qNwmU5YLQt8l1A5czLWLqA5aFNoWK5rwR70QQKN8Vq2p-CX3hP9SV0ZLSxbvF9ShZ3g1rgbk_N_FecTFH7AU"/>
+<div class="absolute bottom-md right-md z-20 space-y-xs">
+<h4 class="font-headline-lg text-[20px] text-primary">תשתית שרתים</h4>
+<p class="text-on-surface-variant font-body-md text-body-md max-w-md">הפלטפורמה רצה ב-99.9% זמינות ב-3 אזורי שירות שונים. עומס נוכחי: 24%.</p>
+</div>
+</div>
+<div class="glass-card rounded-xl p-md flex flex-col justify-center items-center text-center gap-md border border-primary/20 bg-primary/5">
+<span class="material-symbols-outlined text-[64px] text-primary" style="font-variation-settings: 'FILL' 1;">security</span>
+<div>
+<p class="font-title-md text-title-md text-on-surface">פרוטוקול אבטחה</p>
+<p class="text-outline text-label-sm font-label-sm mt-xs">סריקת המערכת האחרונה הסתיימה בהצלחה לפני שעתיים</p>
+</div>
+<button class="w-full bg-primary/10 border border-primary/30 py-sm rounded-lg text-primary font-bold hover:bg-primary hover:text-on-primary transition-all">הורד דוח אבטחה</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Nav for Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex flex-row-reverse justify-around items-center h-16 bg-surface border-t border-outline-variant pb-safe px-4">
+<a class="flex flex-col items-center justify-center text-primary font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-[10px]">לוח בקרה</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-sm text-[10px]">עסקים</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="font-label-sm text-[10px]">נתונים</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-sm text-[10px]">הגדרות</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interactions
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.transition = 'all 0.3s ease-out';
+                card.style.boxShadow = '0px 8px 24px rgba(167, 139, 250, 0.15)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0px 4px 12px rgba(167, 139, 250, 0.05)';
+            });
+        });
+    </script>
+</body></html>

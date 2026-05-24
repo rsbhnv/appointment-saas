@@ -1,0 +1,3 @@
+-- Local development seed. Optional and idempotent.
+-- Intentionally empty for Phase 1: no business/user fixtures.
+-- Per-phase seed data will be added when downstream phases need it.

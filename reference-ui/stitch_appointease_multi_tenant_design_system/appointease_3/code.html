@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="he"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .purple-shadow {
+            box-shadow: 0px 4px 12px rgba(107, 78, 230, 0.08);
+        }
+        .glass-header {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#5f41da",
+                        "secondary": "#5f5c6f",
+                        "primary-fixed-dim": "#cabeff",
+                        "outline-variant": "#c9c4d7",
+                        "surface-variant": "#e4dfff",
+                        "outline": "#797586",
+                        "surface-bright": "#fcf8ff",
+                        "surface": "#fcf8ff",
+                        "tertiary-fixed-dim": "#cabeff",
+                        "on-tertiary-fixed-variant": "#483695",
+                        "secondary-fixed": "#e4e0f6",
+                        "secondary-container": "#e2ddf3",
+                        "inverse-primary": "#cabeff",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e4dfff",
+                        "on-surface": "#1b1931",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#484555",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#e6deff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#5230cd",
+                        "inverse-surface": "#302e47",
+                        "surface-container-high": "#eae5ff",
+                        "surface-container": "#f0ebff",
+                        "on-tertiary-fixed": "#1c0062",
+                        "on-primary-fixed": "#1b0062",
+                        "on-primary-container": "#eee7ff",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f6f1ff",
+                        "surface-dim": "#dbd6f7",
+                        "on-tertiary-container": "#eee7ff",
+                        "primary-container": "#6b4ee6",
+                        "tertiary-container": "#6c5bbb",
+                        "on-secondary-fixed": "#1b1a2a",
+                        "on-secondary-container": "#636073",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-background": "#1b1931",
+                        "inverse-on-surface": "#f3eeff",
+                        "on-primary-fixed-variant": "#4720c2",
+                        "background": "#fcf8ff",
+                        "secondary-fixed-dim": "#c8c4da",
+                        "tertiary": "#5342a1",
+                        "on-secondary-fixed-variant": "#474557",
+                        "tertiary-fixed": "#e6deff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "lg": "40px",
+                        "xl": "64px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "title-md": ["Rubik"],
+                        "headline-lg-mobile": ["Rubik"],
+                        "body-md": ["Rubik"],
+                        "headline-lg": ["Rubik"],
+                        "display-lg": ["Rubik"],
+                        "body-lg": ["Rubik"],
+                        "label-sm": ["Rubik"]
+                    },
+                    "fontSize": {
+                        "title-md": ["20px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "label-sm": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-surface/80 glass-header border-b border-outline-variant/30 px-margin-mobile md:px-margin-desktop h-[60px] flex flex-row-reverse justify-between items-center w-full">
+<div class="flex items-center gap-sm flex-row-reverse">
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">AppointEase</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary overflow-hidden">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-margin-mobile pt-md md:pt-lg">
+<!-- Header Section -->
+<section class="mb-lg">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-xs">התורים שלי</h1>
+<p class="font-body-md text-on-surface-variant">ניהול וצפייה בתורים המתוכננים שלך</p>
+</section>
+<!-- Identification Section (Mobile/Phone Verification) -->
+<section class="mb-xl bg-surface-container-low rounded-xl p-md border border-outline-variant/20 purple-shadow" id="auth-section">
+<div class="flex flex-col md:flex-row-reverse md:items-end gap-md">
+<div class="flex-1 space-y-xs text-right">
+<label class="font-label-sm text-on-surface-variant block" for="phone">מספר טלפון לזיהוי</label>
+<div class="relative">
+<input class="w-full h-12 rounded-lg border border-outline-variant bg-surface-container-lowest px-md text-right focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none font-body-md" id="phone" placeholder="050-000-0000" type="tel"/>
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline" data-icon="smartphone">smartphone</span>
+</div>
+</div>
+<button class="h-12 px-xl bg-primary text-on-primary rounded-lg font-title-md hover:bg-primary-container transition-colors shadow-lg shadow-primary/20 whitespace-nowrap">
+                    צפייה בתורים
+                </button>
+</div>
+<p class="mt-sm text-label-sm text-outline">שלח קוד אימות לנייד כדי לגשת להיסטוריית התורים שלך.</p>
+</section>
+<!-- Appointment List Container -->
+<div class="space-y-md">
+<!-- Appointment Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl p-md border-r-4 border-primary purple-shadow flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-md group hover:scale-[1.01] transition-transform duration-300">
+<div class="flex items-center gap-md flex-row-reverse w-full md:w-auto">
+<div class="w-16 h-16 rounded-xl bg-primary-fixed flex flex-col items-center justify-center text-primary font-bold overflow-hidden">
+<span class="text-label-sm leading-none">אוק׳</span>
+<span class="text-headline-lg-mobile leading-none">24</span>
+</div>
+<div class="text-right">
+<h3 class="font-title-md text-primary">16:30</h3>
+<p class="font-body-md text-on-surface font-semibold">מספרת העיר</p>
+<p class="font-label-sm text-on-surface-variant">תספורת גבר ועיצוב זקן</p>
+</div>
+</div>
+<div class="flex flex-col md:flex-row items-center gap-sm w-full md:w-auto">
+<span class="px-sm py-1 rounded-full bg-surface-container-high text-primary font-label-sm flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                        מאושר
+                    </span>
+<button class="w-full md:w-auto flex items-center justify-center gap-xs text-error font-label-sm hover:bg-error-container/20 px-md py-2 rounded-lg transition-colors border border-transparent hover:border-error-container">
+<span class="material-symbols-outlined text-[20px]" data-icon="cancel">cancel</span>
+                        ביטול תור
+                    </button>
+</div>
+</article>
+<!-- Appointment Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl p-md border-r-4 border-tertiary-container purple-shadow flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-md group hover:scale-[1.01] transition-transform duration-300">
+<div class="flex items-center gap-md flex-row-reverse w-full md:w-auto">
+<div class="w-16 h-16 rounded-xl bg-secondary-fixed flex flex-col items-center justify-center text-on-secondary-container font-bold overflow-hidden">
+<span class="text-label-sm leading-none">נוב׳</span>
+<span class="text-headline-lg-mobile leading-none">02</span>
+</div>
+<div class="text-right">
+<h3 class="font-title-md text-primary">09:00</h3>
+<p class="font-body-md text-on-surface font-semibold">פיזיותרפיה "הגב"</p>
+<p class="font-label-sm text-on-surface-variant">טיפול שיקומי ראשון</p>
+</div>
+</div>
+<div class="flex flex-col md:flex-row items-center gap-sm w-full md:w-auto">
+<span class="px-sm py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+                        ממתין לאישור
+                    </span>
+<button class="w-full md:w-auto flex items-center justify-center gap-xs text-error font-label-sm hover:bg-error-container/20 px-md py-2 rounded-lg transition-colors border border-transparent hover:border-error-container">
+<span class="material-symbols-outlined text-[20px]" data-icon="cancel">cancel</span>
+                        ביטול תור
+                    </button>
+</div>
+</article>
+<!-- Empty State Illustration Placeholder (Hidden by default, used for logic) -->
+<div class="hidden flex-col items-center justify-center py-xl text-center" id="empty-state">
+<div class="w-32 h-32 mb-md bg-surface-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-outline" data-icon="calendar_today">calendar_today</span>
+</div>
+<h3 class="font-title-md text-on-surface mb-xs">לא נמצאו תורים קרובים</h3>
+<p class="font-body-md text-on-surface-variant">מומלץ לחפש שוב לפי מספר טלפון אחר או לקבוע תור חדש</p>
+</div>
+</div>
+<!-- Past Appointments Toggle -->
+<div class="mt-xl text-center">
+<button class="text-primary font-label-sm flex items-center gap-xs mx-auto hover:underline">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+                צפייה בתורים מהעבר
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile only shell context) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex flex-row-reverse justify-around items-center h-16 px-4 bg-surface dark:bg-inverse-surface pb-safe border-t border-outline-variant/30 shadow-[0_-4px_12px_rgba(107,78,230,0.08)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-secondary-fixed/20 p-xs rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">בית</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-bold p-xs rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="event_note" style="font-variation-settings: 'FILL' 1;">event_note</span>
+<span class="font-label-sm text-label-sm">תורים</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-secondary-fixed/20 p-xs rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-label-sm text-label-sm">הודעות</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-secondary-fixed/20 p-xs rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">פרופיל</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for cancel buttons
+        document.querySelectorAll('button.text-error').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const confirmed = confirm('האם אתה בטוח שברצונך לבטל את התור? פעולה זו אינה ניתנת לביטול.');
+                if (confirmed) {
+                    const card = this.closest('article');
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateX(-100px)';
+                    setTimeout(() => {
+                        card.remove();
+                        // Check if list is empty
+                        if (document.querySelectorAll('article').length === 0) {
+                            document.getElementById('empty-state').classList.remove('hidden');
+                            document.getElementById('empty-state').classList.add('flex');
+                        }
+                    }, 400);
+                }
+            });
+        });
+
+        // Phone input formatting
+        const phoneInput = document.getElementById('phone');
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 3 && value.length <= 6) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 6) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value.slice(6, 10);
+            }
+            e.target.value = value;
+        });
+    </script>
+</body></html>

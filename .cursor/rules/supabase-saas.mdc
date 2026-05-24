@@ -1,0 +1,58 @@
+---
+description: Supabase usage for multi-tenant SaaS — RLS, server clients, tenant scope
+globs: src/lib/supabase/**/*.ts,src/server/**/*.ts,src/app/**/route.ts,src/app/**/actions.ts
+alwaysApply: false
+---
+
+# Supabase (multi-tenant SaaS)
+
+## Pick the right client
+
+| Use case | Factory | Where |
+|----------|---------|-------|
+| Browser reads/writes (RLS enforced) | `createSupabaseBrowserClient()` | Client Components |
+| SSR / cookie session (RLS enforced) | `createSupabaseServerClient()` | Server Components, Route Handlers, Server Actions |
+| System / cross-tenant / webhooks | `createSupabaseAdminClient()` | Server-only modules **with audit logging** |
+
+- The admin client **bypasses RLS**. Treat every call as privileged. Never expose it to the client and never use it to handle user-supplied IDs without re-authorizing the caller.
+
+## RLS is the source of truth
+
+- Every new table must ship with RLS enabled and explicit policies. No table is "internal".
+- Tenant-scoped tables include `tenant_id uuid not null`. Policies key on `auth.jwt() ->> 'tenant_id'` (or equivalent claim).
+- Application code still filters by `tenant_id`. RLS is defense in depth, not an excuse to skip the filter.
+
+```sql
+-- GOOD policy template
+alter table public.bookings enable row level security;
+
+create policy "tenant_read" on public.bookings
+for select using (tenant_id = (auth.jwt() ->> 'tenant_id')::uuid);
+
+create policy "tenant_write" on public.bookings
+for insert with check (tenant_id = (auth.jwt() ->> 'tenant_id')::uuid);
+```
+
+## Tenant scope on every query
+
+```ts
+// BAD — trusts client-supplied tenant
+const { data } = await supabase.from("bookings").select("*").eq("tenant_id", body.tenantId);
+
+// GOOD — derive from session
+const { data: { user } } = await supabase.auth.getUser();
+const tenantId = user?.app_metadata.tenant_id;
+if (!tenantId) throw new Error("Unauthorized");
+const { data } = await supabase.from("bookings").select("*").eq("tenant_id", tenantId);
+```
+
+## Roles and permissions
+
+- Roles live in JWT claims (`app_metadata.role`) — server-set, never client-set.
+- Default deny: any handler that mutates data checks role + tenant before touching the DB.
+- Distinguish **platform admin** (cross-tenant) from **tenant admin** (within one tenant). They are different roles with different code paths.
+
+## Generic SaaS naming
+
+- Tables and columns use SaaS-generic names: `tenants`, `memberships`, `resources`, `bookings`, `customers`.
+- Do not introduce `clinics`, `doctors`, `patients`, or other domain-specific names at the infrastructure layer.

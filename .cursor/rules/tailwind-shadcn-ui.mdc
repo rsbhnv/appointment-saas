@@ -1,0 +1,67 @@
+---
+description: Tailwind + shadcn/ui — mobile-first, RTL, accessible
+globs: src/**/*.{tsx,css}
+alwaysApply: false
+---
+
+# Tailwind + shadcn/ui
+
+Inspired by the `awesome-cursorrules` tailwind-css-nextjs guide. Use Tailwind v4 utilities and shadcn/ui primitives from `src/components/ui/`.
+
+## Mobile-first responsive
+
+- Start with the base (mobile) styles, then layer `sm:`, `md:`, `lg:`, `xl:`.
+- Test at 360px width minimum. Avoid fixed pixel widths; prefer `w-full`, `max-w-*`, `min-h-screen`.
+
+```tsx
+// GOOD — mobile first, then scales up
+<div className="flex flex-col gap-3 p-4 sm:flex-row sm:gap-6 sm:p-6 lg:p-8" />
+```
+
+## RTL + Hebrew
+
+- The app is Hebrew-first (`<html lang="he" dir="rtl">`).
+- Use **logical properties**: `ms-*`/`me-*`, `ps-*`/`pe-*`, `start-*`/`end-*`, `text-start`/`text-end`.
+- Never use `ml-*`, `mr-*`, `pl-*`, `pr-*`, `text-left`, `text-right` for layout direction.
+- Icons that imply direction (arrows, chevrons) must mirror in RTL or use direction-neutral icons.
+
+```tsx
+// BAD — breaks in RTL
+<div className="ml-4 text-left" />
+
+// GOOD — direction-aware
+<div className="ms-4 text-start" />
+```
+
+## Design tokens
+
+- Use CSS variables from `globals.css`: `bg-background`, `text-foreground`, `text-muted-foreground`, `border-border`, `bg-primary`, etc.
+- Never hardcode colors (`#fff`, `bg-blue-500`) for theme-able surfaces. Hex is allowed only for brand or static illustrations.
+- Spacing scale: `gap-2`, `gap-4`, `gap-6`, `gap-8`. Radius: `rounded-md`, `rounded-lg`, `rounded-xl`.
+
+## shadcn/ui
+
+- Compose from `@/components/ui/*`. Do **not** rewrite primitives; extend with `className` and `cn()`.
+- Add new primitives via `npx shadcn@latest add <component>`, not by hand.
+- App-specific components live in `src/components/<feature>/` and use `ui/` parts internally.
+
+## Accessibility
+
+- Every interactive element is reachable by keyboard and has a visible focus ring (`focus-visible:*`).
+- Provide `aria-label` for icon-only buttons; provide labels for inputs.
+- Headings follow document order (`h1` → `h2` → `h3`). One `h1` per page.
+- Color is never the sole signal — pair with text or icon.
+- Respect `prefers-reduced-motion` for animations.
+
+```tsx
+// BAD — icon button with no label
+<Button size="icon"><X /></Button>
+
+// GOOD
+<Button size="icon" aria-label="סגירה"><X /></Button>
+```
+
+## Reusable components
+
+- Props use a `Props` type / interface; expose `className` and forward refs when wrapping primitives.
+- Avoid prop explosion — extract sub-components when more than ~8 props accumulate.

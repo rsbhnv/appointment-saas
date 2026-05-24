@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="he"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#c9c4d7",
+                    "on-primary-container": "#eee7ff",
+                    "on-error": "#ffffff",
+                    "secondary-fixed": "#e4e0f6",
+                    "on-tertiary-fixed": "#1c0062",
+                    "inverse-on-surface": "#f3eeff",
+                    "surface-container-highest": "#e4dfff",
+                    "primary-container": "#6b4ee6",
+                    "surface-container-low": "#f6f1ff",
+                    "on-background": "#1b1931",
+                    "secondary-fixed-dim": "#c8c4da",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#484555",
+                    "tertiary-fixed-dim": "#cabeff",
+                    "on-secondary-container": "#636073",
+                    "primary-fixed": "#e6deff",
+                    "tertiary-container": "#6c5bbb",
+                    "surface-container": "#f0ebff",
+                    "on-primary": "#ffffff",
+                    "surface-container-high": "#eae5ff",
+                    "surface-tint": "#5f41da",
+                    "primary-fixed-dim": "#cabeff",
+                    "surface-bright": "#fcf8ff",
+                    "on-tertiary-container": "#eee7ff",
+                    "on-secondary-fixed": "#1b1a2a",
+                    "on-secondary-fixed-variant": "#474557",
+                    "surface": "#fcf8ff",
+                    "inverse-surface": "#302e47",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#dbd6f7",
+                    "surface-variant": "#e4dfff",
+                    "secondary-container": "#e2ddf3",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#1b0062",
+                    "primary": "#5230cd",
+                    "on-tertiary-fixed-variant": "#483695",
+                    "background": "#fcf8ff",
+                    "inverse-primary": "#cabeff",
+                    "on-surface": "#1b1931",
+                    "outline": "#797586",
+                    "tertiary": "#5342a1",
+                    "secondary": "#5f5c6f",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#4720c2",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#e6deff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "32px",
+                    "lg": "40px",
+                    "xs": "4px",
+                    "sm": "12px",
+                    "xl": "64px",
+                    "margin-mobile": "16px",
+                    "base": "8px",
+                    "gutter": "24px",
+                    "md": "24px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Rubik"],
+                    "display-lg": ["Rubik"],
+                    "headline-lg": ["Rubik"],
+                    "body-lg": ["Rubik"],
+                    "body-md": ["Rubik"],
+                    "title-md": ["Rubik"],
+                    "headline-lg-mobile": ["Rubik"]
+            },
+            "fontSize": {
+                    "label-sm": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                    "title-md": ["20px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Rubik', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .card-shadow { shadow-[0px_4px_12px_rgba(107,78,230,0.08)]; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<nav class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md text-primary dark:text-inverse-primary docked full-width top-0 sticky border-b border-outline-variant dark:border-on-surface-variant/10 z-50 flex flex-row-reverse justify-between items-center h-[60px] px-margin-mobile w-full">
+<div class="flex items-center gap-sm">
+<div class="flex flex-col items-end">
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">לוח בקרה</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">מספרת העיר</span>
+</div>
+<button class="p-xs hover:bg-primary-container/10 transition-colors rounded-full active:scale-95" onclick="toggleDrawer()">
+<span class="material-symbols-outlined text-[28px]" data-icon="menu">menu</span>
+</button>
+</div>
+<div class="flex items-center gap-sm">
+<span class="bg-[#FFBF00]/10 text-[#7D5A00] px-sm py-xs rounded-full text-[12px] font-bold border border-[#FFBF00]/20">DEMO MODE</span>
+<div class="w-10 h-10 rounded-full border-2 border-primary-container overflow-hidden bg-surface-container">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a middle-aged male business owner with a friendly smile, set against a clean, light lavender studio background. The lighting is soft and corporate, matching a high-end minimalist UI aesthetic with professional clarity and warm, inviting tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxtmBDlEVs5sFZjAXREcjB7mpw9oedcd1J3vjK7SSZQtooU9zNGP1DNgKB6nNRy19ufaWkrsKN0qbnqoXQJ4ctfyzA4d3pAKehxqxrzzKXSQu5zFK5mu45DfgAVhcMqelRa7CIXY9ZXWKQDOFGnFtZ7AELgZOlugEBOr3HXByu3WC-aEl9x_kwxVBvHYyIH2PDQE6cG0ebvDIf8Bknxw0KYfPu4x3jBSpr8tUjjK1qZoKWDY43voycvEDnhdl6bpKaXCDSENCiln8"/>
+</div>
+</div>
+</nav>
+<!-- NavigationDrawer Overlay -->
+<div class="fixed inset-0 bg-on-background/40 z-[55] opacity-0 pointer-events-none transition-opacity duration-300" id="drawer-overlay" onclick="toggleDrawer()"></div>
+<!-- NavigationDrawer -->
+<aside class="fixed inset-y-0 right-0 z-[60] flex flex-col p-md text-right bg-surface dark:bg-inverse-surface docked full-height right-0 w-[280px] rounded-l-xl shadow-[0px_12px_32px_rgba(107,78,230,0.12)] translate-x-full transition-transform duration-300" id="main-drawer">
+<div class="flex flex-row-reverse items-center justify-between mb-lg">
+<div class="flex flex-row-reverse items-center gap-sm">
+<div class="w-12 h-12 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-title-md">
+<span class="material-symbols-outlined" data-icon="store">store</span>
+</div>
+<div class="text-right">
+<h3 class="font-title-md text-title-md text-primary">ישראל ישראלי</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">אדמין</p>
+</div>
+</div>
+<button class="p-xs text-on-surface-variant" onclick="toggleDrawer()">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<nav class="flex flex-col gap-base">
+<!-- Active: לוח בקרה -->
+<a class="flex flex-row-reverse items-center gap-sm bg-primary-container text-on-primary-container rounded-lg p-sm translate-x-1 transition-transform font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-title-md text-title-md">לוח בקרה</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant dark:text-surface-variant p-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-title-md text-title-md">תורים</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant dark:text-surface-variant p-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-title-md text-title-md">לקוחות</span>
+</a>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant dark:text-surface-variant p-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-title-md text-title-md">שירותים</span>
+</a>
+<div class="my-md border-t border-outline-variant/30"></div>
+<a class="flex flex-row-reverse items-center gap-sm text-on-surface-variant dark:text-surface-variant p-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-title-md text-title-md">הגדרות</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="px-margin-mobile pt-md pb-32 max-w-md mx-auto">
+<!-- KPI Grid -->
+<section class="grid grid-cols-2 gap-sm mb-lg">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest p-sm rounded-xl shadow-[0px_4px_12px_rgba(107,78,230,0.08)] relative overflow-hidden border border-outline-variant/10">
+<div class="absolute top-0 right-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex flex-col gap-xs items-end">
+<span class="text-on-surface-variant font-label-sm text-label-sm">תורים היום</span>
+<span class="text-primary font-headline-lg-mobile text-headline-lg-mobile">12</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest p-sm rounded-xl shadow-[0px_4px_12px_rgba(107,78,230,0.08)] relative overflow-hidden border border-outline-variant/10">
+<div class="absolute top-0 right-0 bottom-0 w-1 bg-tertiary"></div>
+<div class="flex flex-col gap-xs items-end">
+<span class="text-on-surface-variant font-label-sm text-label-sm">תורים השבוע</span>
+<span class="text-tertiary font-headline-lg-mobile text-headline-lg-mobile">48</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest p-sm rounded-xl shadow-[0px_4px_12px_rgba(107,78,230,0.08)] relative overflow-hidden border border-outline-variant/10">
+<div class="absolute top-0 right-0 bottom-0 w-1 bg-secondary"></div>
+<div class="flex flex-col gap-xs items-end">
+<span class="text-on-surface-variant font-label-sm text-label-sm">סה״כ לקוחות</span>
+<span class="text-secondary font-headline-lg-mobile text-headline-lg-mobile">842</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest p-sm rounded-xl shadow-[0px_4px_12px_rgba(107,78,230,0.08)] relative overflow-hidden border border-outline-variant/10">
+<div class="absolute top-0 right-0 bottom-0 w-1 bg-primary-fixed-dim"></div>
+<div class="flex flex-col gap-xs items-end">
+<span class="text-on-surface-variant font-label-sm text-label-sm">תפוסה %</span>
+<span class="text-primary-container font-headline-lg-mobile text-headline-lg-mobile">92%</span>
+</div>
+</div>
+</section>
+<!-- Appointments List -->
+<section>
+<div class="flex items-center justify-between mb-sm">
+<a class="text-primary font-label-sm text-label-sm hover:underline" href="#">הצג הכל</a>
+<h2 class="font-title-md text-title-md text-on-surface">תורים קרובים</h2>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Appointment Row 1 -->
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_12px_rgba(107,78,230,0.08)] border border-outline-variant/5 flex flex-row-reverse items-center justify-between active:scale-[0.98] transition-transform">
+<div class="flex flex-row-reverse items-center gap-md">
+<div class="text-right">
+<span class="block font-bold text-primary font-title-md text-title-md">14:30</span>
+<span class="text-on-surface-variant text-[12px]">עוד 15 דק׳</span>
+</div>
+<div class="w-[1px] h-10 bg-outline-variant/30 mx-xs"></div>
+<div class="text-right">
+<h4 class="font-bold text-on-surface font-body-md text-body-md">דניאל לוי</h4>
+<p class="text-on-surface-variant font-label-sm text-label-sm">תספורת גברים + זקן</p>
+</div>
+</div>
+<div>
+<span class="bg-primary-container text-on-primary-container px-sm py-xs rounded-full text-[12px] font-bold">הוזמן</span>
+</div>
+</div>
+<!-- Appointment Row 2 -->
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_12px_rgba(107,78,230,0.08)] border border-outline-variant/5 flex flex-row-reverse items-center justify-between active:scale-[0.98] transition-transform">
+<div class="flex flex-row-reverse items-center gap-md">
+<div class="text-right">
+<span class="block font-bold text-primary font-title-md text-title-md">15:15</span>
+<span class="text-on-surface-variant text-[12px]">מחר</span>
+</div>
+<div class="w-[1px] h-10 bg-outline-variant/30 mx-xs"></div>
+<div class="text-right">
+<h4 class="font-bold text-on-surface font-body-md text-body-md">שרה כהן</h4>
+<p class="text-on-surface-variant font-label-sm text-label-sm">עיצוב שיער ערב</p>
+</div>
+</div>
+<div>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full text-[12px] font-bold">הגיע</span>
+</div>
+</div>
+<!-- Appointment Row 3 -->
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_12px_rgba(107,78,230,0.08)] border border-outline-variant/5 flex flex-row-reverse items-center justify-between active:scale-[0.98] transition-transform">
+<div class="flex flex-row-reverse items-center gap-md">
+<div class="text-right">
+<span class="block font-bold text-primary font-title-md text-title-md">16:00</span>
+<span class="text-on-surface-variant text-[12px]">בעוד שעה</span>
+</div>
+<div class="w-[1px] h-10 bg-outline-variant/30 mx-xs"></div>
+<div class="text-right">
+<h4 class="font-bold text-on-surface font-body-md text-body-md">מיכאל אברהם</h4>
+<p class="text-on-surface-variant font-label-sm text-label-sm">טיפול פנים</p>
+</div>
+</div>
+<div>
+<span class="bg-primary-container text-on-primary-container px-sm py-xs rounded-full text-[12px] font-bold">הוזמן</span>
+</div>
+</div>
+<!-- Appointment Row 4 -->
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_12px_rgba(107,78,230,0.08)] border border-outline-variant/5 flex flex-row-reverse items-center justify-between active:scale-[0.98] transition-transform">
+<div class="flex flex-row-reverse items-center gap-md">
+<div class="text-right">
+<span class="block font-bold text-primary font-title-md text-title-md">17:00</span>
+<span class="text-on-surface-variant text-[12px]">היום</span>
+</div>
+<div class="w-[1px] h-10 bg-outline-variant/30 mx-xs"></div>
+<div class="text-right">
+<h4 class="font-bold text-on-surface font-body-md text-body-md">נועה לוין</h4>
+<p class="text-on-surface-variant font-label-sm text-label-sm">תספורת נשים</p>
+</div>
+</div>
+<div>
+<span class="bg-error-container text-on-error-container px-sm py-xs rounded-full text-[12px] font-bold">בוטל</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-20 left-6 z-40 bg-primary-container text-on-primary-container w-14 h-14 rounded-2xl shadow-lg flex items-center justify-center active:scale-90 transition-all hover:brightness-110">
+<span class="material-symbols-outlined text-[32px]" data-icon="add">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex flex-row-reverse justify-around items-center h-16 px-4 bg-surface dark:bg-inverse-surface pb-safe border-t border-outline-variant/30 shadow-[0_-4px_12px_rgba(107,78,230,0.08)]">
+<a class="flex flex-col items-center justify-center text-primary dark:text-inverse-primary font-bold scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">בית</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-secondary-fixed/20 p-xs rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+<span class="font-label-sm text-label-sm">תורים</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-secondary-fixed/20 p-xs rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-label-sm text-label-sm">הודעות</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-secondary-fixed/20 p-xs rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">פרופיל</span>
+</a>
+</nav>
+<script>
+        function toggleDrawer() {
+            const drawer = document.getElementById('main-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            const isOpen = !drawer.classList.contains('translate-x-full');
+            
+            if (isOpen) {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('opacity-0');
+                overlay.classList.add('pointer-events-none');
+            } else {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('opacity-0');
+                overlay.classList.remove('pointer-events-none');
+            }
+        }
+    </script>
+</body></html>

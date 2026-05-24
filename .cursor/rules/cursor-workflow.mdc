@@ -1,0 +1,41 @@
+---
+description: Cursor agent workflow — explanations, safe commands, project conventions
+alwaysApply: true
+---
+
+# Cursor Workflow
+
+## Explain before you execute
+
+- For any terminal command that mutates state (install, migrate, delete, rename, push, force), state in plain language: **what** runs, **why now**, **what changes irreversibly**.
+- Never chain destructive commands silently. Prefer one step at a time when stakes are high.
+- Read-only inspection (`ls`, `git status`, `npm run lint`) does not need an explanation, but batching many at once does.
+
+## Respect the project conventions
+
+- This is a Next.js App Router scaffold — read `node_modules/next/dist/docs/` before assuming an API.
+- Follow folder boundaries: `src/app/`, `src/components/`, `src/lib/`, `src/server/`, `src/types/`, `src/config/`.
+- Prefer editing existing files over creating new ones. Do not add README/docs unless the user asked.
+
+## Stay within scope
+
+- Do not introduce booking, scheduling, or database schema work until explicitly requested.
+- Do not hardcode clinic-specific naming anywhere. Use generic SaaS terms (`tenant`, `member`, `resource`, `booking`, `customer`).
+- Do not add features the user did not ask for. Suggest, then wait for approval.
+
+## Code changes
+
+- Run `npm run typecheck` and `npm run lint` after substantive edits when feasible.
+- After editing files, fix lints you introduced; leave pre-existing lints alone unless asked.
+- Use `StrReplace` / `Write` tools for file edits. Do not use shell `sed`/`awk` to mutate files.
+
+## Communication
+
+- Reference files with backticks: `src/lib/supabase/server.ts`.
+- When unsure between two valid approaches with real trade-offs, ask one focused question instead of guessing.
+- Surface security or data-loss risks immediately — do not bury them under implementation detail.
+
+## Secrets
+
+- Never echo, log, or print env values from `.env.local`.
+- When a command needs a secret, instruct the user to set it themselves; do not generate or hardcode it.
