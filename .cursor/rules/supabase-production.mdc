@@ -1,0 +1,73 @@
+---
+description: Supabase production integration — secrets, MVC layers, RLS, audit, demo toggle
+globs: supabase/**/*,src/lib/supabase/**/*.ts,src/lib/demo/**/*.ts,src/server/**/*.ts,src/app/**/route.ts,src/app/**/actions.ts,src/types/database.ts
+alwaysApply: false
+---
+
+# Supabase Production Integration
+
+Use this rule when wiring real Supabase (not demo fixtures) or adding DB-backed features.
+
+## Secrets and env
+
+- **Public (client-safe):** only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- **Server-only:** `SUPABASE_SERVICE_ROLE_KEY` — import via `src/lib/env/server.ts` inside modules with `import "server-only"`.
+- Never expose `SUPABASE_SERVICE_ROLE_KEY` in Client Components, `NEXT_PUBLIC_*`, logs, errors, or responses.
+
+```ts
+// BAD — service role in client bundle
+const admin = createClient(url, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+
+// GOOD — admin client from server-only module
+import "server-only";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+```
+
+## Demo mode vs production
+
+- Respect `NEXT_PUBLIC_DEMO_MODE` / `isDemoMode()` — demo stores in `src/lib/demo/*` for local UX.
+- Production path: set demo off, configure Supabase env vars, use repositories backed by Supabase (same function signatures where possible).
+- Do not remove demo support when adding real Supabase; branch at the **repository** layer, not in UI.
+
+## MVC-style separation
+
+| Layer | Location | Responsibility |
+|-------|----------|----------------|
+| **Models** | `supabase/migrations/`, `src/types/database.ts` | Schema, migrations, generated types |
+| **Views** | `src/app/**`, `src/components/**` | React UI only — no direct Supabase calls |
+| **Controllers** | `src/app/**/route.ts`, `src/server/actions/**` | HTTP/actions: authZ, Zod parse, call services |
+| **Services** | `src/server/services/**` | Business rules, orchestration, audit wrappers |
+| **Repositories** | `src/server/repositories/**` | All Supabase reads/writes |
+
+- UI and Server Actions must **not** call `supabase.from(...)` directly — go through repositories/services.
+- Admin client bypasses RLS; use only in repositories after server-side authorization.
+
+## Tenant isolation
+
+- Tenant-scoped tables include `business_id uuid not null` (FK to `businesses`).
+- Enable RLS on every table; policies must enforce `business_id` (and role) — app filters are defense in depth, not a substitute.
+- **Never trust** client-supplied `business_id`, `user_id`, or role. Re-derive from session/guards on every entry point.
+
+```ts
+// BAD
+await repo.updateBooking(input.businessId, input.id, patch);
+
+// GOOD
+const { membership } = await requireBusinessMember();
+await repo.updateBooking(membership.businessId, parsed.id, patch);
+```
+
+## Validation and mutations
+
+- Parse all Server Action / Route Handler input with **Zod** at the boundary; reject unknown fields.
+- Every mutation: validate → authorize → repository → audit (when sensitive).
+
+## Audit logging
+
+- Sensitive actions (auth, membership changes, billing, cross-tenant admin, destructive ops) must call `recordAuditEvent` or `withAudit`.
+- Include `business_id`, `user_id`, `action`, and minimal metadata — never secrets.
+
+## Naming
+
+- Generic SaaS terms only: `business`, `member`, `customer`, `booking`, `service`, `staff`.
+- Do not hardcode clinic-specific or vertical-specific names in schema, code, or seed data.

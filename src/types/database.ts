@@ -1,12 +1,7 @@
 /**
- * Database types — Phase 1 hand-written stub.
- *
- * Regenerate with `npm run supabase:types` once a Supabase project is linked:
- *   supabase gen types typescript --linked > src/types/database.ts
- *
- * Until then, this file matches `supabase/migrations/20260519100000_initial_schema.sql`.
+ * Database types — hand-written to match supabase/migrations.
+ * Regenerate with: npm run supabase:types
  */
-
 export type Json =
   | string
   | number
@@ -18,9 +13,31 @@ export type Json =
 export type BusinessStatus = "active" | "suspended" | "pending_setup";
 export type MemberRole = "business_owner" | "business_admin" | "staff";
 export type MemberStatus = "active" | "invited" | "suspended";
-
-/** ISO weekday: 1 = Monday … 7 = Sunday. */
+export type AppointmentStatus =
+  | "pending"
+  | "confirmed"
+  | "cancelled"
+  | "completed"
+  | "no_show";
+export type PaymentStatus =
+  | "pending"
+  | "authorized"
+  | "captured"
+  | "failed"
+  | "refunded"
+  | "cancelled";
+export type NotificationChannel = "email" | "sms" | "whatsapp" | "push";
+export type NotificationStatus = "queued" | "sent" | "failed" | "skipped";
+export type SubscriptionStatus =
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "cancelled"
+  | "paused";
+export type SlotOverrideType = "block" | "open";
 export type IsoWeekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+type Timestamps = { created_at: string; updated_at: string };
 
 export interface Database {
   public: {
@@ -41,9 +58,7 @@ export interface Database {
           primary_color: string | null;
           secondary_color: string | null;
           status: BusinessStatus;
-          created_at: string;
-          updated_at: string;
-        };
+        } & Timestamps;
         Insert: {
           id?: string;
           name: string;
@@ -59,10 +74,80 @@ export interface Database {
           primary_color?: string | null;
           secondary_color?: string | null;
           status?: BusinessStatus;
-          created_at?: string;
-          updated_at?: string;
-        };
+        } & Partial<Timestamps>;
         Update: Partial<Database["public"]["Tables"]["businesses"]["Insert"]>;
+        Relationships: [];
+      };
+      business_members: {
+        Row: {
+          id: string;
+          business_id: string;
+          user_id: string;
+          role: MemberRole;
+          permissions: Json;
+          status: MemberStatus;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          business_id: string;
+          user_id: string;
+          role?: MemberRole;
+          permissions?: Json;
+          status?: MemberStatus;
+        } & Partial<Timestamps>;
+        Update: Partial<Database["public"]["Tables"]["business_members"]["Insert"]>;
+        Relationships: [];
+      };
+      locations: {
+        Row: {
+          id: string;
+          business_id: string;
+          name: string;
+          address_line: string | null;
+          city: string | null;
+          timezone: string | null;
+          phone: string | null;
+          is_primary: boolean;
+          active: boolean;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          business_id: string;
+          name: string;
+          address_line?: string | null;
+          city?: string | null;
+          timezone?: string | null;
+          phone?: string | null;
+          is_primary?: boolean;
+          active?: boolean;
+        } & Partial<Timestamps>;
+        Update: Partial<Database["public"]["Tables"]["locations"]["Insert"]>;
+        Relationships: [];
+      };
+      staff_members: {
+        Row: {
+          id: string;
+          business_id: string;
+          user_id: string | null;
+          name: string;
+          title: string | null;
+          phone: string | null;
+          email: string | null;
+          color: string | null;
+          active: boolean;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          business_id: string;
+          user_id?: string | null;
+          name: string;
+          title?: string | null;
+          phone?: string | null;
+          email?: string | null;
+          color?: string | null;
+          active?: boolean;
+        } & Partial<Timestamps>;
+        Update: Partial<Database["public"]["Tables"]["staff_members"]["Insert"]>;
         Relationships: [];
       };
       services: {
@@ -80,9 +165,7 @@ export interface Database {
           requires_payment: boolean;
           deposit_amount: number | null;
           active: boolean;
-          created_at: string;
-          updated_at: string;
-        };
+        } & Timestamps;
         Insert: {
           id?: string;
           business_id: string;
@@ -90,62 +173,140 @@ export interface Database {
           description?: string | null;
           duration_minutes: number;
           price: number;
-          currency: string;
+          currency?: string;
           buffer_before_minutes?: number;
           buffer_after_minutes?: number;
           capacity?: number;
           requires_payment?: boolean;
           deposit_amount?: number | null;
           active?: boolean;
-          created_at?: string;
-          updated_at?: string;
-        };
+        } & Partial<Timestamps>;
         Update: Partial<Database["public"]["Tables"]["services"]["Insert"]>;
-        Relationships: [
-          {
-            foreignKeyName: "services_business_id_fkey";
-            columns: ["business_id"];
-            referencedRelation: "businesses";
-            referencedColumns: ["id"];
-          },
-        ];
+        Relationships: [];
       };
-      staff_members: {
+      customers: {
         Row: {
           id: string;
           business_id: string;
-          user_id: string | null;
-          name: string;
-          title: string | null;
+          full_name: string;
           phone: string | null;
           email: string | null;
-          color: string | null;
-          active: boolean;
-          created_at: string;
-          updated_at: string;
-        };
+          notes: string | null;
+        } & Timestamps;
         Insert: {
           id?: string;
           business_id: string;
-          user_id?: string | null;
-          name: string;
-          title?: string | null;
+          full_name: string;
           phone?: string | null;
           email?: string | null;
-          color?: string | null;
+          notes?: string | null;
+        } & Partial<Timestamps>;
+        Update: Partial<Database["public"]["Tables"]["customers"]["Insert"]>;
+        Relationships: [];
+      };
+      availability_rules: {
+        Row: {
+          id: string;
+          business_id: string;
+          staff_member_id: string | null;
+          location_id: string | null;
+          day_of_week: number;
+          start_time: string;
+          end_time: string;
+          effective_from: string | null;
+          effective_until: string | null;
+          active: boolean;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          business_id: string;
+          staff_member_id?: string | null;
+          location_id?: string | null;
+          day_of_week: number;
+          start_time: string;
+          end_time: string;
+          effective_from?: string | null;
+          effective_until?: string | null;
           active?: boolean;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["staff_members"]["Insert"]>;
-        Relationships: [
-          {
-            foreignKeyName: "staff_members_business_id_fkey";
-            columns: ["business_id"];
-            referencedRelation: "businesses";
-            referencedColumns: ["id"];
-          },
-        ];
+        } & Partial<Timestamps>;
+        Update: Partial<Database["public"]["Tables"]["availability_rules"]["Insert"]>;
+        Relationships: [];
+      };
+      availability_exceptions: {
+        Row: {
+          id: string;
+          business_id: string;
+          staff_member_id: string | null;
+          location_id: string | null;
+          exception_date: string;
+          closed: boolean;
+          start_time: string | null;
+          end_time: string | null;
+          reason: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          business_id: string;
+          staff_member_id?: string | null;
+          location_id?: string | null;
+          exception_date: string;
+          closed?: boolean;
+          start_time?: string | null;
+          end_time?: string | null;
+          reason?: string | null;
+        } & Partial<Timestamps>;
+        Update: Partial<
+          Database["public"]["Tables"]["availability_exceptions"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      slot_overrides: {
+        Row: {
+          id: string;
+          business_id: string;
+          staff_member_id: string | null;
+          location_id: string | null;
+          starts_at: string;
+          ends_at: string;
+          override_type: SlotOverrideType;
+          reason: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          business_id: string;
+          staff_member_id?: string | null;
+          location_id?: string | null;
+          starts_at: string;
+          ends_at: string;
+          override_type?: SlotOverrideType;
+          reason?: string | null;
+        } & Partial<Timestamps>;
+        Update: Partial<Database["public"]["Tables"]["slot_overrides"]["Insert"]>;
+        Relationships: [];
+      };
+      cancellation_policies: {
+        Row: {
+          id: string;
+          business_id: string;
+          name: string;
+          min_hours_before: number;
+          fee_amount: number | null;
+          currency: string;
+          active: boolean;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          business_id: string;
+          name: string;
+          min_hours_before?: number;
+          fee_amount?: number | null;
+          currency?: string;
+          active?: boolean;
+        } & Partial<Timestamps>;
+        Update: Partial<
+          Database["public"]["Tables"]["cancellation_policies"]["Insert"]
+        >;
+        Relationships: [];
       };
       app_settings: {
         Row: {
@@ -157,9 +318,7 @@ export interface Database {
           allow_customer_cancellation: boolean;
           cancellation_min_hours: number;
           confirmation_message: string | null;
-          created_at: string;
-          updated_at: string;
-        };
+        } & Timestamps;
         Insert: {
           id?: string;
           business_id: string;
@@ -169,49 +328,139 @@ export interface Database {
           allow_customer_cancellation?: boolean;
           cancellation_min_hours?: number;
           confirmation_message?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+        } & Partial<Timestamps>;
         Update: Partial<Database["public"]["Tables"]["app_settings"]["Insert"]>;
-        Relationships: [
-          {
-            foreignKeyName: "app_settings_business_id_fkey";
-            columns: ["business_id"];
-            referencedRelation: "businesses";
-            referencedColumns: ["id"];
-          },
-        ];
+        Relationships: [];
       };
-      business_members: {
+      appointments: {
         Row: {
           id: string;
           business_id: string;
-          user_id: string;
-          role: MemberRole;
-          permissions: Json;
-          status: MemberStatus;
+          customer_id: string;
+          service_id: string;
+          staff_member_id: string;
+          location_id: string | null;
+          starts_at: string;
+          ends_at: string;
+          status: AppointmentStatus;
+          notes: string | null;
+          cancellation_policy_id: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          business_id: string;
+          customer_id: string;
+          service_id: string;
+          staff_member_id: string;
+          location_id?: string | null;
+          starts_at: string;
+          ends_at: string;
+          status?: AppointmentStatus;
+          notes?: string | null;
+          cancellation_policy_id?: string | null;
+        } & Partial<Timestamps>;
+        Update: Partial<Database["public"]["Tables"]["appointments"]["Insert"]>;
+        Relationships: [];
+      };
+      payments: {
+        Row: {
+          id: string;
+          business_id: string;
+          appointment_id: string | null;
+          amount: number;
+          currency: string;
+          status: PaymentStatus;
+          provider: string | null;
+          provider_ref: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          business_id: string;
+          appointment_id?: string | null;
+          amount: number;
+          currency?: string;
+          status?: PaymentStatus;
+          provider?: string | null;
+          provider_ref?: string | null;
+        } & Partial<Timestamps>;
+        Update: Partial<Database["public"]["Tables"]["payments"]["Insert"]>;
+        Relationships: [];
+      };
+      notification_logs: {
+        Row: {
+          id: string;
+          business_id: string;
+          appointment_id: string | null;
+          customer_id: string | null;
+          channel: NotificationChannel;
+          status: NotificationStatus;
+          payload: Json;
+          sent_at: string | null;
           created_at: string;
-          updated_at: string;
         };
         Insert: {
           id?: string;
           business_id: string;
-          user_id: string;
-          role?: MemberRole;
-          permissions?: Json;
-          status?: MemberStatus;
+          appointment_id?: string | null;
+          customer_id?: string | null;
+          channel: NotificationChannel;
+          status?: NotificationStatus;
+          payload?: Json;
+          sent_at?: string | null;
           created_at?: string;
-          updated_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["business_members"]["Insert"]>;
-        Relationships: [
-          {
-            foreignKeyName: "business_members_business_id_fkey";
-            columns: ["business_id"];
-            referencedRelation: "businesses";
-            referencedColumns: ["id"];
-          },
-        ];
+        Update: Partial<
+          Database["public"]["Tables"]["notification_logs"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      subscription_plans: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          price: number;
+          currency: string;
+          interval: string;
+          features: Json;
+          active: boolean;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          price: number;
+          currency?: string;
+          interval?: string;
+          features?: Json;
+          active?: boolean;
+        } & Partial<Timestamps>;
+        Update: Partial<
+          Database["public"]["Tables"]["subscription_plans"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      business_subscriptions: {
+        Row: {
+          id: string;
+          business_id: string;
+          plan_id: string;
+          status: SubscriptionStatus;
+          current_period_start: string;
+          current_period_end: string;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          business_id: string;
+          plan_id: string;
+          status?: SubscriptionStatus;
+          current_period_start?: string;
+          current_period_end: string;
+        } & Partial<Timestamps>;
+        Update: Partial<
+          Database["public"]["Tables"]["business_subscriptions"]["Insert"]
+        >;
+        Relationships: [];
       };
       audit_logs: {
         Row: {
@@ -235,14 +484,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["audit_logs"]["Insert"]>;
-        Relationships: [
-          {
-            foreignKeyName: "audit_logs_business_id_fkey";
-            columns: ["business_id"];
-            referencedRelation: "businesses";
-            referencedColumns: ["id"];
-          },
-        ];
+        Relationships: [];
       };
     };
     Views: {
@@ -266,19 +508,19 @@ export interface Database {
         Args: { target_business: string; required_roles?: MemberRole[] | null };
         Returns: boolean;
       };
-      is_platform_admin: {
-        Args: Record<string, never>;
-        Returns: boolean;
-      };
-      is_reserved_slug: {
-        Args: { candidate: string };
-        Returns: boolean;
-      };
+      is_platform_admin: { Args: Record<string, never>; Returns: boolean };
+      is_reserved_slug: { Args: { candidate: string }; Returns: boolean };
     };
     Enums: {
       business_status: BusinessStatus;
       member_role: MemberRole;
       member_status: MemberStatus;
+      appointment_status: AppointmentStatus;
+      payment_status: PaymentStatus;
+      notification_channel: NotificationChannel;
+      notification_status: NotificationStatus;
+      subscription_status: SubscriptionStatus;
+      slot_override_type: SlotOverrideType;
     };
     CompositeTypes: Record<string, never>;
   };

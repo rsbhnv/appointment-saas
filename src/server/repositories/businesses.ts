@@ -39,12 +39,13 @@ export async function findBusinessBySlug(
   }
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
-    .from("businesses")
+    .from("business_public")
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
-  if (error) throw new Error(`businesses lookup failed: ${error.message}`);
-  return data ?? null;
+  if (error) throw new Error(`business_public lookup failed: ${error.message}`);
+  if (!data) return null;
+  return findBusinessById(data.id);
 }
 
 /** Lists businesses the caller is a member of (RLS-filtered). */

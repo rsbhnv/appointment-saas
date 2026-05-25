@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { LogoMark } from "@/components/layout/logo-mark";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import {
   Sheet,
@@ -50,23 +50,23 @@ export function SiteHeader({ navItems = [], secondaryAction }: SiteHeaderProps) 
             aria-label="ניווט ראשי"
           >
             {navItems.map((item) => (
-              <Button
+              <ButtonLink
                 key={item.href}
+                href={item.href}
                 variant="ghost"
                 size="sm"
-                render={<Link href={item.href} />}
               >
                 {item.label}
-              </Button>
+              </ButtonLink>
             ))}
             {secondaryAction ? (
-              <Button
+              <ButtonLink
+                href={secondaryAction.href}
                 variant="cta"
                 size="sm"
-                render={<Link href={secondaryAction.href} />}
               >
                 {secondaryAction.label}
-              </Button>
+              </ButtonLink>
             ) : null}
           </nav>
 

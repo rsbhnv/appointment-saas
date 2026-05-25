@@ -1,3 +1,4 @@
+import { isDemoMode } from "@/lib/env/client";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -10,6 +11,10 @@ export const dynamic = "force-dynamic";
  * the role-appropriate landing page (or honours a safe `next` parameter).
  */
 export async function GET(request: NextRequest) {
+  if (isDemoMode) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const next = url.searchParams.get("next");

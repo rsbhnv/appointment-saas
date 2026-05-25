@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { Star } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -77,17 +76,22 @@ export default function HomePage() {
               {siteConfig.description}
             </p>
             <div className="mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
-              <Button variant="cta" size="xl" className="w-full sm:w-auto" render={<Link href="/login" />}>
+              <ButtonLink
+                href="/login"
+                variant="cta"
+                size="xl"
+                className="w-full sm:w-auto"
+              >
                 התחל בחינם
-              </Button>
-              <Button
+              </ButtonLink>
+              <ButtonLink
+                href="/demo-studio"
                 variant="outline"
                 size="xl"
                 className="w-full border-primary/20 sm:w-auto"
-                render={<Link href="/demo-studio" />}
               >
                 צפה בהדגמה
-              </Button>
+              </ButtonLink>
             </div>
           </div>
         </Container>

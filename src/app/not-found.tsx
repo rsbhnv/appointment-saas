@@ -1,6 +1,4 @@
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
@@ -10,9 +8,9 @@ export default function NotFound() {
       <p className="max-w-sm text-on-surface-variant">
         העמוד שחיפשת אינו קיים או הוסר.
       </p>
-      <Button variant="cta" render={<Link href="/" />}>
+      <ButtonLink href="/" variant="cta">
         חזרה לדף הבית
-      </Button>
+      </ButtonLink>
     </div>
   );
 }
