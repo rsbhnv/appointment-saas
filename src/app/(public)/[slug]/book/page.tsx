@@ -76,7 +76,7 @@ export default async function CustomerBookingPage({
           settings={bookingSettings}
         />
 
-      <p className="mt-8 text-center text-xs text-on-surface-variant">
+      <p className="mt-10 text-center text-xs text-on-surface-variant/80">
         צוות {business.name}?{" "}
         <Link href="/login?next=/dashboard" className="font-medium text-primary hover:underline">
           כניסה ללוח בקרה

@@ -41,3 +41,28 @@ export const portalStatusMuted =
 
 export const portalCancelBtn =
   "rounded-full border-2 border-destructive/40 bg-transparent text-sm font-semibold text-destructive hover:bg-destructive/5";
+
+/** Landing page hero card */
+export const portalLandingCard =
+  "relative overflow-hidden rounded-[1.75rem] border border-outline-variant/10 bg-card/95 p-6 shadow-[0_8px_40px_rgba(28,32,24,0.07)] backdrop-blur-sm sm:rounded-[2rem] sm:p-8";
+
+export const portalLandingWelcome =
+  "text-xs font-semibold uppercase tracking-[0.2em] text-primary/80";
+
+export const portalLandingBusinessName =
+  "text-2xl font-bold leading-tight tracking-tight text-on-surface sm:text-3xl";
+
+export const portalLandingDescription =
+  "mx-auto max-w-sm text-base leading-relaxed text-on-surface-variant/90";
+
+export const portalLandingTagline =
+  "text-lg font-semibold text-primary sm:text-xl";
+
+export const portalLandingHint =
+  "text-sm leading-relaxed text-on-surface-variant";
+
+export const portalLandingBtnPrimary =
+  "h-16 w-full gap-3 rounded-2xl text-lg font-semibold shadow-[0_6px_22px_color-mix(in_srgb,var(--primary)_28%,transparent)] transition-all hover:shadow-[0_10px_28px_color-mix(in_srgb,var(--primary)_34%,transparent)] hover:opacity-[0.97] active:scale-[0.99]";
+
+export const portalLandingBtnSecondary =
+  "h-14 w-full gap-3 rounded-2xl border-2 border-outline-variant/20 bg-card/80 text-base font-semibold text-on-surface shadow-sm transition-all hover:border-primary/25 hover:bg-surface-container-low/90 active:scale-[0.99]";

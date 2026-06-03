@@ -27,6 +27,9 @@ import {
   portalBtnSecondary,
   portalCard,
   portalCardInner,
+  portalLandingBtnPrimary,
+  portalLandingBtnSecondary,
+  portalLandingCard,
   portalSectionSubtitle,
   portalSectionTitle,
   portalSlotChip,
@@ -408,7 +411,7 @@ export function PublicBookingWizard({
 
   if (step === "landing") {
     return (
-      <div className="space-y-10">
+      <div className={cn(portalLandingCard, "space-y-8")}>
         <BusinessBookingHeader
           name={businessName}
           description={businessDescription}
@@ -420,20 +423,20 @@ export function PublicBookingWizard({
             type="button"
             variant="cta"
             size="xl"
-            className={portalBtnPrimary}
+            className={portalLandingBtnPrimary}
             onClick={() => startPhoneStep("book")}
           >
-            <Plus className="size-5" />
+            <Plus className="size-5 shrink-0" strokeWidth={2.25} />
             קביעת תור חדש
           </Button>
           <Button
             type="button"
             variant="outline"
             size="xl"
-            className={portalBtnSecondary}
+            className={portalLandingBtnSecondary}
             onClick={() => startPhoneStep("appointments")}
           >
-            <List className="size-5" />
+            <List className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
             התורים שלי
           </Button>
         </div>
