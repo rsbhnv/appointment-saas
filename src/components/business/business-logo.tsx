@@ -8,27 +8,25 @@ type BusinessLogoProps = {
   logoUrl?: string | null;
   size?: "sm" | "md" | "lg";
   className?: string;
-  rounded?: "full" | "xl";
-  /** Show uploaded logo at natural aspect ratio (no square crop). */
-  natural?: boolean;
 };
 
-const SIZE_CLASSES = {
-  sm: {
-    box: "size-9 text-sm",
-    image: 36,
-    padding: "p-1",
-  },
-  md: {
-    box: "size-16 text-xl sm:size-20 sm:text-2xl",
-    image: 80,
-    padding: "p-2",
-  },
-  lg: {
-    box: "size-24 text-3xl sm:size-28 sm:text-4xl",
-    image: 112,
-    padding: "p-3",
-  },
+const FALLBACK_SIZE_CLASSES = {
+  sm: "size-9 text-sm",
+  md: "size-16 text-xl sm:size-20 sm:text-2xl",
+  lg: "size-24 text-3xl sm:size-28 sm:text-4xl",
+} as const;
+
+/** Uploaded logos: natural aspect ratio, no avatar frame. */
+const LOGO_IMAGE_CLASSES = {
+  sm: "max-h-9 max-w-[140px]",
+  md: "max-h-16 max-w-[180px]",
+  lg: "max-h-20 max-w-[220px]",
+} as const;
+
+const LOGO_IMAGE_DIMENSIONS = {
+  sm: { width: 140, height: 36 },
+  md: { width: 180, height: 64 },
+  lg: { width: 220, height: 80 },
 } as const;
 
 export function BusinessLogo({
@@ -36,43 +34,25 @@ export function BusinessLogo({
   logoUrl,
   size = "md",
   className,
-  rounded = "xl",
-  natural = false,
 }: BusinessLogoProps) {
-  const sizing = SIZE_CLASSES[size];
-  const roundedClass = rounded === "full" ? "rounded-full" : "rounded-2xl";
-
   if (logoUrl?.trim()) {
-    if (natural) {
-      return (
-        <div className={cn("flex shrink-0 items-center justify-center", className)}>
-          <Image
-            src={logoUrl}
-            alt=""
-            width={280}
-            height={96}
-            className="h-auto max-h-32 w-auto max-w-[min(100%,280px)] object-contain"
-            unoptimized
-          />
-        </div>
-      );
-    }
-
+    const dims = LOGO_IMAGE_DIMENSIONS[size];
     return (
       <div
         className={cn(
-          "flex shrink-0 items-center justify-center overflow-hidden border border-outline-variant/20 bg-surface-container-lowest shadow-sm",
-          roundedClass,
-          sizing.box,
+          "flex shrink-0 items-center justify-center bg-transparent",
           className,
         )}
       >
         <Image
           src={logoUrl}
           alt=""
-          width={sizing.image}
-          height={sizing.image}
-          className={cn("size-full object-contain", sizing.padding)}
+          width={dims.width}
+          height={dims.height}
+          className={cn(
+            "block h-auto w-auto rounded-none border-0 bg-transparent object-contain shadow-none",
+            LOGO_IMAGE_CLASSES[size],
+          )}
           unoptimized
         />
       </div>
@@ -82,9 +62,8 @@ export function BusinessLogo({
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center justify-center border border-primary/20 bg-primary/10 font-bold text-primary",
-        roundedClass,
-        sizing.box,
+        "flex shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 font-bold text-primary",
+        FALLBACK_SIZE_CLASSES[size],
         className,
       )}
       aria-hidden

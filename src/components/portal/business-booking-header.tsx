@@ -22,13 +22,7 @@ export function BusinessBookingHeader({
 }: BusinessBookingHeaderProps) {
   return (
     <header className={cn("space-y-5 text-center", className)}>
-      <BusinessLogo
-        name={name}
-        logoUrl={logoUrl}
-        size="lg"
-        natural
-        className="mx-auto"
-      />
+      <BusinessLogo name={name} logoUrl={logoUrl} size="lg" className="mx-auto" />
 
       <div className="space-y-2">
         {variant === "landing" ? (

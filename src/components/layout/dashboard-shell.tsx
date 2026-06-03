@@ -49,7 +49,6 @@ export function DashboardShell({
                 name={businessName}
                 logoUrl={businessLogoUrl}
                 size="sm"
-                rounded="full"
               />
               <span className="truncate text-base">{businessName}</span>
             </>
@@ -137,7 +136,6 @@ export function DashboardShell({
                     name={businessName}
                     logoUrl={businessLogoUrl}
                     size="sm"
-                    rounded="full"
                   />
                   <h2 className="truncate text-xl font-bold text-on-surface">{businessName}</h2>
                 </>
