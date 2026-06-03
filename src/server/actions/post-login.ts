@@ -9,11 +9,8 @@ export type PostLoginTarget =
   | { kind: "onboarding"; path: "/dashboard?empty=1" };
 
 /**
- * Resolves the destination after a successful sign-in.
- *
- * - Platform super admins go to /super-admin.
- * - Users with at least one active business go to /dashboard.
- * - Users with no membership land on /dashboard?empty=1 (empty state).
+ * Resolves the destination after a successful dashboard sign-in.
+ * Customers use phone-based booking — no Supabase Auth for them.
  */
 export async function resolvePostLoginTarget(): Promise<PostLoginTarget> {
   const user = await requireSession();
@@ -22,8 +19,9 @@ export async function resolvePostLoginTarget(): Promise<PostLoginTarget> {
   }
 
   const memberships = await findActiveMembershipsForUser(user.id);
-  if (memberships.length === 0) {
-    return { kind: "onboarding", path: "/dashboard?empty=1" };
+  if (memberships.length > 0) {
+    return { kind: "dashboard", path: "/dashboard" };
   }
-  return { kind: "dashboard", path: "/dashboard" };
+
+  return { kind: "onboarding", path: "/dashboard?empty=1" };
 }

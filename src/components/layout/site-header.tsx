@@ -76,7 +76,7 @@ export function SiteHeader({ navItems = [], secondaryAction }: SiteHeaderProps) 
                 render={
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     className="ms-auto md:hidden"
                     aria-label="פתיחת תפריט"
                   >
@@ -97,7 +97,7 @@ export function SiteHeader({ navItems = [], secondaryAction }: SiteHeaderProps) 
                           <Link
                             href={item.href}
                             className={cn(
-                              "rounded-lg px-3 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container-high",
+                              "flex min-h-11 items-center rounded-lg px-3 py-3 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container-high",
                             )}
                           >
                             {item.label}

@@ -52,20 +52,16 @@ Barrel: `src/server/repositories/index.ts`
 | `appSettingsRepository` | `app-settings.ts` | `app_settings` |
 | `locationRepository` | `locations.ts` | `locations` |
 
-Every repository branches on `isDemoMode()`:
+Every repository uses Supabase clients:
 
-- **Demo:** `src/lib/demo/*` in-memory stores
-- **Production:** `createSupabaseServerClient()` (RLS) or admin client for audit inserts
+- **Reads/writes:** `createSupabaseServerClient()` (RLS-scoped)
+- **Audit inserts:** admin client via `createSupabaseAdminClient()` when service role is configured
 
 ## Models
 
 - **SQL migrations** — source of truth for schema, RLS, constraints.
 - **`src/types/database.ts`** — generated/hand-written DB types.
 - **Domain types** — e.g. `src/types/tenant.ts`, guard types in `src/server/guards/`.
-
-## Demo mode
-
-`NEXT_PUBLIC_DEMO_MODE=true` keeps UI working without Supabase. Switching to production is an env change only — repositories select the backend.
 
 ## Security rules (summary)
 

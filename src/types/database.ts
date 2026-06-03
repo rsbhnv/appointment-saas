@@ -57,7 +57,11 @@ export interface Database {
           logo_url: string | null;
           primary_color: string | null;
           secondary_color: string | null;
+          theme_style: string | null;
           status: BusinessStatus;
+          address: string | null;
+          arrival_instructions: string | null;
+          payment_methods: string | null;
         } & Timestamps;
         Insert: {
           id?: string;
@@ -73,7 +77,11 @@ export interface Database {
           logo_url?: string | null;
           primary_color?: string | null;
           secondary_color?: string | null;
+          theme_style?: string | null;
           status?: BusinessStatus;
+          address?: string | null;
+          arrival_instructions?: string | null;
+          payment_methods?: string | null;
         } & Partial<Timestamps>;
         Update: Partial<Database["public"]["Tables"]["businesses"]["Insert"]>;
         Relationships: [];
@@ -192,6 +200,9 @@ export interface Database {
           phone: string | null;
           email: string | null;
           notes: string | null;
+          sms_consent: boolean;
+          whatsapp_consent: boolean;
+          email_consent: boolean;
         } & Timestamps;
         Insert: {
           id?: string;
@@ -200,6 +211,9 @@ export interface Database {
           phone?: string | null;
           email?: string | null;
           notes?: string | null;
+          sms_consent?: boolean;
+          whatsapp_consent?: boolean;
+          email_consent?: boolean;
         } & Partial<Timestamps>;
         Update: Partial<Database["public"]["Tables"]["customers"]["Insert"]>;
         Relationships: [];
@@ -317,6 +331,8 @@ export interface Database {
           max_appointments_per_customer_per_day: number;
           allow_customer_cancellation: boolean;
           cancellation_min_hours: number;
+          default_slot_duration_minutes: number;
+          break_between_appointments_minutes: number;
           confirmation_message: string | null;
         } & Timestamps;
         Insert: {
@@ -327,6 +343,8 @@ export interface Database {
           max_appointments_per_customer_per_day?: number;
           allow_customer_cancellation?: boolean;
           cancellation_min_hours?: number;
+          default_slot_duration_minutes?: number;
+          break_between_appointments_minutes?: number;
           confirmation_message?: string | null;
         } & Partial<Timestamps>;
         Update: Partial<Database["public"]["Tables"]["app_settings"]["Insert"]>;
@@ -344,6 +362,9 @@ export interface Database {
           ends_at: string;
           status: AppointmentStatus;
           notes: string | null;
+          internal_notes: string | null;
+          cancellation_reason: string | null;
+          cancelled_at: string | null;
           cancellation_policy_id: string | null;
         } & Timestamps;
         Insert: {
@@ -357,6 +378,9 @@ export interface Database {
           ends_at: string;
           status?: AppointmentStatus;
           notes?: string | null;
+          internal_notes?: string | null;
+          cancellation_reason?: string | null;
+          cancelled_at?: string | null;
           cancellation_policy_id?: string | null;
         } & Partial<Timestamps>;
         Update: Partial<Database["public"]["Tables"]["appointments"]["Insert"]>;
@@ -496,9 +520,15 @@ export interface Database {
           description: string | null;
           logo_url: string | null;
           primary_color: string | null;
+          secondary_color: string | null;
+          theme_style: string | null;
           timezone: string;
           locale: string;
           currency: string;
+          status: BusinessStatus;
+          address: string | null;
+          arrival_instructions: string | null;
+          payment_methods: string | null;
         };
         Relationships: [];
       };

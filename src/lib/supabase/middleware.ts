@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { clientEnv, isSupabaseConfigured } from "@/lib/env/client";
+import { getSupabaseFetch } from "@/lib/supabase/fetch-insecure";
 import type { Database } from "@/types/database";
 
 export type SessionUpdateResult = {
@@ -23,10 +24,13 @@ export async function updateSupabaseSession(
 
   let supabaseResponse = response;
 
+  const customFetch = getSupabaseFetch();
+
   const supabase = createServerClient<Database>(
     clientEnv.NEXT_PUBLIC_SUPABASE_URL!,
     clientEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      ...(customFetch ? { global: { fetch: customFetch } } : {}),
       cookies: {
         getAll() {
           return request.cookies.getAll();

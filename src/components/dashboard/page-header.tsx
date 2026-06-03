@@ -21,11 +21,11 @@ export function PageHeader({
       )}
     >
       <div className="space-y-1 text-start">
-        <h1 className="text-2xl font-bold tracking-tight text-on-surface md:text-3xl">
+        <h1 className="text-xl font-bold tracking-tight text-on-surface sm:text-2xl md:text-3xl">
           {title}
         </h1>
         {description ? (
-          <p className="text-base leading-relaxed text-on-surface-variant">
+          <p className="text-sm leading-relaxed text-on-surface-variant sm:text-base">
             {description}
           </p>
         ) : null}

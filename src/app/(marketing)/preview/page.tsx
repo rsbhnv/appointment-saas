@@ -18,6 +18,7 @@ const SCREEN_LINKS = [
     links: [
       { href: "/dashboard", label: "סקירה" },
       { href: "/dashboard/calendar", label: "יומן" },
+      { href: "/preview/calendar", label: "יומן — תצוגות עיצוב" },
       { href: "/dashboard/availability", label: "זמינות" },
       { href: "/dashboard/customers", label: "לקוחות" },
       { href: "/dashboard/services", label: "שירותים" },
@@ -51,6 +52,11 @@ export default function PreviewPage() {
           <h1 className="text-3xl font-bold text-on-surface">כל המסכים</h1>
           <p className="text-on-surface-variant">
             מפת ניווט ל-{siteConfig.name}. קישורים שעדיין לא מומשו יציגו 404.
+            תצוגות עיצוב ליומן:{" "}
+            <Link href="/preview/calendar" className="text-primary hover:underline">
+              /preview/calendar
+            </Link>
+            .
           </p>
         </div>
 

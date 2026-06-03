@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 
 import { clientEnv, isSupabaseConfigured } from "@/lib/env/client";
 import { isSupabaseAdminConfigured, serverEnv } from "@/lib/env/server";
+import { getSupabaseFetch } from "@/lib/supabase/fetch";
 import type { Database } from "@/types/database";
 
 /**
@@ -18,10 +19,13 @@ export function createSupabaseAdminClient() {
     );
   }
 
+  const customFetch = getSupabaseFetch();
+
   return createClient<Database>(
     clientEnv.NEXT_PUBLIC_SUPABASE_URL!,
     serverEnv.SUPABASE_SERVICE_ROLE_KEY!,
     {
+      ...(customFetch ? { global: { fetch: customFetch } } : {}),
       auth: {
         autoRefreshToken: false,
         persistSession: false,

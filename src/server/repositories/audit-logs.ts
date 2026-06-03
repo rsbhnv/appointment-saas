@@ -46,6 +46,46 @@ export async function listAuditLogs(filter?: {
   return data ?? [];
 }
 
+export async function listAuditLogsForEntity(filter: {
+  businessId: string;
+  entityType: string;
+  entityId: string;
+  limit?: number;
+}): Promise<AuditLog[]> {
+  if (isDemoMode) {
+    return listDemoAuditEvents({ businessId: filter.businessId })
+      .filter(
+        (row) =>
+          row.entity_type === filter.entityType && row.entity_id === filter.entityId,
+      )
+      .map((row) => ({
+        id: row.id,
+        business_id: row.business_id,
+        user_id: row.user_id,
+        action: row.action,
+        entity_type: row.entity_type,
+        entity_id: row.entity_id,
+        metadata: row.metadata as Json,
+        created_at: row.created_at,
+      }));
+  }
+
+  const supabase = await createSupabaseServerClient();
+  let query = supabase
+    .from("audit_logs")
+    .select("*")
+    .eq("business_id", filter.businessId)
+    .eq("entity_type", filter.entityType)
+    .eq("entity_id", filter.entityId)
+    .order("created_at", { ascending: false });
+
+  if (filter.limit) query = query.limit(filter.limit);
+
+  const { data, error } = await query;
+  if (error) throw new Error(`audit_logs entity list failed: ${error.message}`);
+  return data ?? [];
+}
+
 /** Service-role insert — used by audit service only. */
 export async function insertAuditLog(
   row: Omit<Tables<"audit_logs">, "id" | "created_at"> & {

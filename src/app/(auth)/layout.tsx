@@ -16,7 +16,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
       {children}
 
-      <p className="pointer-events-none fixed inset-x-0 bottom-0 p-6 text-center text-xs text-outline/60">
+      <p className="mt-10 text-center text-xs text-on-surface-variant/70 pb-safe">
         © {new Date().getFullYear()} {siteConfig.name}. כל הזכויות שמורות.
       </p>
     </div>

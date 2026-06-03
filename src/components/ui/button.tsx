@@ -12,9 +12,9 @@ const buttonVariants = cva(
       variant: {
         default:
           "bg-primary-container text-on-primary-container shadow-purple-sm hover:opacity-90",
-        cta: "bg-primary text-primary-foreground shadow-purple-sm hover:bg-primary-container",
+        cta: "bg-primary text-primary-foreground shadow-[0_4px_14px_rgba(28,32,24,0.12)] hover:opacity-95 active:opacity-90",
         outline:
-          "border-outline-variant/30 bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          "border-2 border-outline-variant/25 bg-card text-on-surface shadow-sm hover:bg-surface-container-low dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:
           "bg-secondary-container text-on-surface hover:bg-secondary-fixed aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
@@ -25,15 +25,15 @@ const buttonVariants = cva(
       },
       size: {
         default:
-          "h-9 gap-1.5 px-4 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        xs: "h-7 gap-1 rounded-md px-2 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-8 gap-1 rounded-lg px-3 text-[0.8rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-12 gap-2 px-5 text-base has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
-        xl: "h-14 gap-2 rounded-xl px-6 text-base has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
-        icon: "size-9",
+          "h-9 gap-1.5 px-4 max-md:h-11 max-md:px-5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        xs: "h-7 gap-1 rounded-md px-2 text-xs max-md:h-10 max-md:px-3 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-8 gap-1 rounded-lg px-3 text-[0.8rem] max-md:h-10 max-md:px-4 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
+        xl: "h-14 gap-2 rounded-full px-8 text-base has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
+        lg: "h-12 gap-2 rounded-full px-6 text-base has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
+        icon: "size-9 max-md:size-11",
         "icon-xs":
-          "size-7 rounded-md [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm": "size-8 rounded-lg",
+          "size-7 rounded-md max-md:size-10 [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm": "size-8 rounded-lg max-md:size-10",
         "icon-lg": "size-11",
       },
     },

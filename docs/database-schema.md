@@ -72,7 +72,7 @@ All `SECURITY DEFINER` functions set `search_path` explicitly.
 
 ## Seed
 
-`supabase/seed.sql` — Demo Studio with services, staff, settings, availability rules, subscription plan. UUIDs align with `src/lib/demo/fixtures.ts`.
+`supabase/seed.sql` — Demo Studio with services, staff, settings, availability rules, subscription plan.
 
 ## Types
 

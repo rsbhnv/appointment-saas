@@ -1,12 +1,12 @@
 ---
-description: Supabase production integration — secrets, MVC layers, RLS, audit, demo toggle
-globs: supabase/**/*,src/lib/supabase/**/*.ts,src/lib/demo/**/*.ts,src/server/**/*.ts,src/app/**/route.ts,src/app/**/actions.ts,src/types/database.ts
+description: Supabase production integration — secrets, MVC layers, RLS, audit
+globs: supabase/**/*,src/lib/supabase/**/*.ts,src/server/**/*.ts,src/app/**/route.ts,src/app/**/actions.ts,src/types/database.ts
 alwaysApply: false
 ---
 
 # Supabase Production Integration
 
-Use this rule when wiring real Supabase (not demo fixtures) or adding DB-backed features.
+Use this rule when wiring Supabase or adding DB-backed features.
 
 ## Secrets and env
 
@@ -23,11 +23,10 @@ import "server-only";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 ```
 
-## Demo mode vs production
+## Data access
 
-- Respect `NEXT_PUBLIC_DEMO_MODE` / `isDemoMode()` — demo stores in `src/lib/demo/*` for local UX.
-- Production path: set demo off, configure Supabase env vars, use repositories backed by Supabase (same function signatures where possible).
-- Do not remove demo support when adding real Supabase; branch at the **repository** layer, not in UI.
+- All reads/writes go through **repositories** backed by Supabase (`createSupabaseServerClient()`).
+- Configure Supabase env vars in `.env.local` before running authenticated flows.
 
 ## MVC-style separation
 

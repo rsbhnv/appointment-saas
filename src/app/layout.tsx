@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Rubik } from "next/font/google";
+import Script from "next/script";
 
 import { AppProviders } from "@/components/providers/app-providers";
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
@@ -41,6 +42,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#fcf8ff" },
     { media: "(prefers-color-scheme: dark)", color: "#0f0e1a" },
@@ -60,6 +63,13 @@ export default function RootLayout({
       className={`${rubik.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
+        <Script
+          id="system-theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var d=document.documentElement,m=window.matchMedia("(prefers-color-scheme: dark)");d.classList.add(m.matches?"dark":"light")}catch(e){}})();`,
+          }}
+        />
         <AppProviders>
           {children}
           <ServiceWorkerRegister />

@@ -66,6 +66,13 @@ export const demoServicesStore = {
     return { ...store.rows[index]! };
   },
 
+  delete(id: string): void {
+    const store = getStore();
+    const index = store.rows.findIndex((row) => row.id === id);
+    if (index === -1) throw new Error("service not found");
+    store.rows.splice(index, 1);
+  },
+
   reset(): void {
     const g = globalThis as GlobalWithStore;
     delete g[globalKey];

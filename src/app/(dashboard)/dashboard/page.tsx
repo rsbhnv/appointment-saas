@@ -10,15 +10,9 @@ import {
 } from "@/components/ui/card";
 import { GuardError, requireBusinessMember, requireSession } from "@/server/guards";
 import { findBusinessById } from "@/server/repositories/businesses";
+import { getDashboardStats } from "@/server/repositories/dashboard-stats";
 
 export const dynamic = "force-dynamic";
-
-const KPIS = [
-  { id: "today", label: "תורים היום", value: "3", hint: "דמו" },
-  { id: "week", label: "תורים השבוע", value: "12", hint: "דמו" },
-  { id: "customers", label: "סך לקוחות", value: "48", hint: "דמו" },
-  { id: "occupancy", label: "תפוסה", value: "72%", hint: "דמו" },
-];
 
 export default async function DashboardOverviewPage({
   searchParams,
@@ -44,11 +38,40 @@ export default async function DashboardOverviewPage({
     ? await findBusinessById(membership.businessId)
     : null;
 
+  const stats = membership
+    ? await getDashboardStats(membership.businessId)
+    : null;
+
+  const kpis = stats
+    ? [
+        {
+          id: "today",
+          label: "תורים היום",
+          value: String(stats.appointmentsToday),
+        },
+        {
+          id: "week",
+          label: "תורים השבוע",
+          value: String(stats.appointmentsThisWeek),
+        },
+        {
+          id: "customers",
+          label: "סך לקוחות",
+          value: String(stats.customerCount),
+        },
+        {
+          id: "staff",
+          label: "צוות פעיל",
+          value: String(stats.activeStaffCount),
+        },
+      ]
+    : [];
+
   return (
     <div className="space-y-8">
       <PageHeader
         title={`שלום${business ? `, ${business.name}` : ""}`}
-        description="סקירה תפעולית של העסק. הנתונים המוצגים הם דמו עד חיבור מנוע התורים."
+        description="סקירה תפעולית של העסק — נתונים מ-Supabase."
         action={<Badge variant="accent">סקירה</Badge>}
       />
 
@@ -69,12 +92,11 @@ export default async function DashboardOverviewPage({
       ) : (
         <>
           <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-4">
-            {KPIS.map((kpi, index) => (
+            {kpis.map((kpi, index) => (
               <KpiCard
                 key={kpi.id}
                 label={kpi.label}
                 value={kpi.value}
-                hint={kpi.hint}
                 accent={index === 0}
               />
             ))}

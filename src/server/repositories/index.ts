@@ -12,3 +12,4 @@ export * as availabilityRepository from "./availability";
 export * as auditLogRepository from "./audit-logs";
 export * as appSettingsRepository from "./app-settings";
 export * as locationRepository from "./locations";
+export * as dashboardStatsRepository from "./dashboard-stats";

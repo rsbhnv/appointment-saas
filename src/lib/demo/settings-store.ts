@@ -41,6 +41,9 @@ export const demoSettingsStore = {
           patch.max_appointments_per_customer_per_day ?? 1,
         allow_customer_cancellation: patch.allow_customer_cancellation ?? true,
         cancellation_min_hours: patch.cancellation_min_hours ?? 4,
+        default_slot_duration_minutes: patch.default_slot_duration_minutes ?? 60,
+        break_between_appointments_minutes:
+          patch.break_between_appointments_minutes ?? 15,
         confirmation_message: patch.confirmation_message ?? null,
       };
       const row: Tables<"app_settings"> = {
@@ -52,6 +55,9 @@ export const demoSettingsStore = {
           input.max_appointments_per_customer_per_day ?? 1,
         allow_customer_cancellation: input.allow_customer_cancellation ?? true,
         cancellation_min_hours: input.cancellation_min_hours ?? 4,
+        default_slot_duration_minutes: input.default_slot_duration_minutes ?? 60,
+        break_between_appointments_minutes:
+          input.break_between_appointments_minutes ?? 15,
         confirmation_message: input.confirmation_message ?? null,
         created_at: now,
         updated_at: now,

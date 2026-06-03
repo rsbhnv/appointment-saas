@@ -1,5 +1,6 @@
 import "server-only";
 
+import { migrateDemoLogoDataUrl } from "@/lib/demo/logo-store";
 import { DEMO_BUSINESS } from "./fixtures";
 import type { Tables, TablesUpdate } from "@/types/database";
 
@@ -23,7 +24,14 @@ function getStore(): BusinessStore {
 }
 
 export function readDemoBusiness(): Tables<"businesses"> {
-  return { ...getStore().business };
+  const store = getStore();
+  const business = { ...store.business };
+  const migratedLogoUrl = migrateDemoLogoDataUrl(business.id, business.logo_url);
+  if (migratedLogoUrl !== business.logo_url) {
+    store.business = { ...store.business, logo_url: migratedLogoUrl };
+    return { ...store.business };
+  }
+  return business;
 }
 
 export function updateDemoBusiness(

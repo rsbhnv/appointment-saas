@@ -1,0 +1,3 @@
+-- Intentionally remote-only: personal 40-day challenge tracker (same Supabase project).
+-- Schema was applied on remote; this file aligns migration history only.
+-- Do not modify challenge_days from appointment-saas.

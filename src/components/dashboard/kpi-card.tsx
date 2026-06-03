@@ -18,8 +18,8 @@ export function KpiCard({
   return (
     <div
       className={cn(
-        "glass-card rounded-xl p-6 shadow-purple-sm",
-        accent && "border-e-4 border-e-primary-container",
+        "rounded-2xl border border-outline-variant/15 bg-card p-6 shadow-[0_4px_24px_rgba(28,32,24,0.06)]",
+        accent && "ring-2 ring-primary/20",
         className,
       )}
     >

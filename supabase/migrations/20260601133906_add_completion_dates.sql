@@ -1,0 +1,2 @@
+-- Intentionally remote-only: completion timestamps for challenge_days (personal project).
+-- Applied on remote; history alignment only. Do not modify from appointment-saas.
