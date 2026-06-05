@@ -44,6 +44,11 @@ export function customerBookingUrl(slug: string): string {
   return `${base}${customerBookingPath(slug)}`;
 }
 
+export function customerMyAppointmentsUrl(slug: string): string {
+  const base = siteConfig.url.replace(/\/$/, "");
+  return `${base}${customerMyAppointmentsPath(slug)}`;
+}
+
 /** Legacy portal path — redirects to {@link customerBookingPath}. */
 export function legacyCustomerPortalPath(slug: string): string {
   return `/b/${slug}`;

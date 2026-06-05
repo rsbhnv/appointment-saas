@@ -366,6 +366,7 @@ export interface Database {
           cancellation_reason: string | null;
           cancelled_at: string | null;
           cancellation_policy_id: string | null;
+          reminder_sent_at: string | null;
         } & Timestamps;
         Insert: {
           id?: string;
@@ -382,6 +383,7 @@ export interface Database {
           cancellation_reason?: string | null;
           cancelled_at?: string | null;
           cancellation_policy_id?: string | null;
+          reminder_sent_at?: string | null;
         } & Partial<Timestamps>;
         Update: Partial<Database["public"]["Tables"]["appointments"]["Insert"]>;
         Relationships: [];
