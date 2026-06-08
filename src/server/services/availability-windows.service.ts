@@ -45,12 +45,45 @@ export type ResolveDayWindowsInput = {
 function mapOpenExceptionRows(
   rows: AvailabilityException[],
 ): WorkingHoursWindow[] {
-  return rows
-    .map((row) => ({
-      startMinutes: parseTimeToMinutes(row.start_time!),
-      endMinutes: parseTimeToMinutes(row.end_time!),
-    }))
-    .sort((a, b) => a.startMinutes - b.startMinutes);
+  return mergeWorkingWindows(
+    rows
+      .map((row) => ({
+        startMinutes: parseTimeToMinutes(row.start_time!),
+        endMinutes: parseTimeToMinutes(row.end_time!),
+      }))
+      .sort((a, b) => a.startMinutes - b.startMinutes),
+  );
+}
+
+/** Collapse identical or overlapping windows (e.g. global + staff weekly rules). */
+export function mergeWorkingWindows(
+  windows: WorkingHoursWindow[],
+): WorkingHoursWindow[] {
+  if (windows.length <= 1) return windows;
+
+  const sorted = [...windows].sort((a, b) => a.startMinutes - b.startMinutes);
+  const merged: WorkingHoursWindow[] = [];
+
+  for (const window of sorted) {
+    const last = merged[merged.length - 1];
+    if (!last) {
+      merged.push({ ...window });
+      continue;
+    }
+
+    if (window.endMinutes <= last.endMinutes) {
+      continue;
+    }
+
+    if (window.startMinutes <= last.endMinutes) {
+      last.endMinutes = window.endMinutes;
+      continue;
+    }
+
+    merged.push({ ...window });
+  }
+
+  return merged;
 }
 
 /**
@@ -111,7 +144,10 @@ export function resolveDayWorkingWindowsForStaff(
     dayOfWeek,
     new Set([input.staffMemberId]),
   );
-  return ruleWindows.length > 0 ? ruleWindows : DEFAULT_WINDOWS;
+  if (ruleWindows.length > 0) {
+    return mergeWorkingWindows(ruleWindows);
+  }
+  return DEFAULT_WINDOWS;
 }
 
 /**

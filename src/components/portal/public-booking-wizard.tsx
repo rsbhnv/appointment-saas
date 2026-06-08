@@ -108,8 +108,8 @@ const EMPTY_PROFILE: CustomerProfile = {
   emailConsent: false,
 };
 
-function slotTimeKey(slot: { startsAt: string; endsAt: string }): string {
-  return `${slot.startsAt}|${slot.endsAt}`;
+function slotTimeKey(slot: { startsAt: string }): string {
+  return slot.startsAt;
 }
 
 function dedupeTimeSlots<T extends { startsAt: string; endsAt: string }>(slots: T[]): T[] {

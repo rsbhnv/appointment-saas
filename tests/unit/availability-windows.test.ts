@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { getDateAvailabilitySnapshot } from "@/lib/availability/date-exceptions";
 import { resolveDayWorkingWindowsForStaff } from "@/server/services/availability-windows.service";
-import type { AvailabilityException } from "@/server/repositories/availability";
+import type {
+  AvailabilityException,
+  AvailabilityRule,
+} from "@/server/repositories/availability";
 
 const STAFF_ID = "4506846e-1fef-4867-a009-8578bbd4d36f";
 
@@ -74,6 +77,65 @@ describe("resolveDayWorkingWindowsForStaff", () => {
     });
 
     expect(windows).toEqual([]);
+  });
+
+  it("merges duplicate global and staff weekly rules", () => {
+    const rules: AvailabilityRule[] = [
+      {
+        id: "1",
+        business_id: "b1",
+        staff_member_id: null,
+        location_id: null,
+        day_of_week: 2,
+        start_time: "09:00:00",
+        end_time: "13:00:00",
+        active: true,
+        effective_from: null,
+        effective_until: null,
+        created_at: "",
+        updated_at: "",
+      },
+      {
+        id: "2",
+        business_id: "b1",
+        staff_member_id: STAFF_ID,
+        location_id: null,
+        day_of_week: 2,
+        start_time: "09:00:00",
+        end_time: "13:00:00",
+        active: true,
+        effective_from: null,
+        effective_until: null,
+        created_at: "",
+        updated_at: "",
+      },
+      {
+        id: "3",
+        business_id: "b1",
+        staff_member_id: STAFF_ID,
+        location_id: null,
+        day_of_week: 2,
+        start_time: "15:00:00",
+        end_time: "17:00:00",
+        active: true,
+        effective_from: null,
+        effective_until: null,
+        created_at: "",
+        updated_at: "",
+      },
+    ];
+
+    const windows = resolveDayWorkingWindowsForStaff({
+      dateInput: "2026-06-09",
+      rules,
+      exceptions: [],
+      staffMemberId: STAFF_ID,
+    });
+
+    expect(windows).toEqual([
+      { startMinutes: 9 * 60, endMinutes: 13 * 60 },
+      { startMinutes: 15 * 60, endMinutes: 17 * 60 },
+    ]);
   });
 });
 

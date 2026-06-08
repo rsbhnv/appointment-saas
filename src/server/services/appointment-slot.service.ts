@@ -413,6 +413,7 @@ export async function getAvailableSlotsForAdmin(
   );
 
   const daySlots = calendarSlots.filter((row) => row.date === query.date);
+  const seenStarts = new Set<string>();
   return daySlots
     .filter((slot) => {
       const spanMinutes =
@@ -425,7 +426,12 @@ export async function getAvailableSlotsForAdmin(
       endsAt: new Date(
         new Date(slot.startsAt).getTime() + service.duration_minutes * 60_000,
       ).toISOString(),
-    }));
+    }))
+    .filter((slot) => {
+      if (seenStarts.has(slot.startsAt)) return false;
+      seenStarts.add(slot.startsAt);
+      return true;
+    });
 }
 
 /** Customer booking — aligned with the admin calendar grid, respects booking constraints. */
