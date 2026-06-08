@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getTwilioConfig } from "@/lib/env/server";
+import { getDevInsecureFetch } from "@/lib/supabase/fetch-insecure";
 import type { SmsProvider, SmsSendInput, SmsSendResult } from "./types";
 
 type TwilioMessagesResponse = {
@@ -28,7 +29,8 @@ export class TwilioSmsProvider implements SmsProvider {
     const url = `https://api.twilio.com/2010-04-01/Accounts/${config.accountSid}/Messages.json`;
 
     try {
-      const response = await fetch(url, {
+      const httpFetch = getDevInsecureFetch() ?? fetch;
+      const response = await httpFetch(url, {
         method: "POST",
         headers: {
           Authorization: `Basic ${auth}`,

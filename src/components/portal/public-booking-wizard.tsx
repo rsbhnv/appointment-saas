@@ -108,6 +108,20 @@ const EMPTY_PROFILE: CustomerProfile = {
   emailConsent: false,
 };
 
+function slotTimeKey(slot: { startsAt: string; endsAt: string }): string {
+  return `${slot.startsAt}|${slot.endsAt}`;
+}
+
+function dedupeTimeSlots<T extends { startsAt: string; endsAt: string }>(slots: T[]): T[] {
+  const seen = new Set<string>();
+  return slots.filter((slot) => {
+    const key = slotTimeKey(slot);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export function PublicBookingWizard({
   businessSlug,
   businessName,
@@ -230,8 +244,9 @@ export function PublicBookingWizard({
       });
       if (cancelled) return;
       if (result.ok) {
-        setSlots(result.slots);
-        setSelectedSlot(result.slots[0]?.startsAt ?? "");
+        const uniqueSlots = dedupeTimeSlots(result.slots);
+        setSlots(uniqueSlots);
+        setSelectedSlot(uniqueSlots[0]?.startsAt ?? "");
       } else {
         setSlots([]);
         setSelectedSlot("");
@@ -625,7 +640,7 @@ export function PublicBookingWizard({
                 <div className="flex flex-wrap gap-2">
                   {slots.map((slot) => (
                     <button
-                      key={slot.startsAt}
+                      key={slotTimeKey(slot)}
                       type="button"
                       className={cn(
                         portalSlotChip,

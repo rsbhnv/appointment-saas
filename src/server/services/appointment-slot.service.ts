@@ -18,7 +18,9 @@ import type {
   AvailableSlot,
   CalendarAvailableSlot,
 } from "@/lib/calendar/types";
-import { resolveDayWorkingWindows } from "@/server/services/availability-windows.service";
+import {
+  resolveDayWorkingWindowsForStaff,
+} from "@/server/services/availability-windows.service";
 import {
   listAvailabilityExceptionsForSlotEngine,
   listAvailabilityRulesForSlotEngine,
@@ -49,12 +51,12 @@ async function resolveWorkingWindows(
     listAvailabilityExceptionsForSlotEngine(businessId),
   ]);
 
-  return resolveDayWorkingWindows({
+  return resolveDayWorkingWindowsForStaff({
     dateInput,
     timeZone,
     rules,
     exceptions,
-    staffMemberIds: new Set([staffMemberId]),
+    staffMemberId,
   });
 }
 
@@ -305,8 +307,6 @@ export async function listCalendarAvailableSlots(
   );
   if (activeStaff.length === 0) return [];
 
-  const primaryStaff = activeStaff[0]!;
-  const activeStaffIds = new Set(activeStaff.map((member) => member.id));
   const slotDuration = settings?.default_slot_duration_minutes ?? 60;
   const breakMinutes = settings?.break_between_appointments_minutes ?? 15;
   const slotStepMinutes = slotDuration + breakMinutes;
@@ -316,25 +316,27 @@ export async function listCalendarAvailableSlots(
     dates.push(toDateInputValue(day));
   }
 
-  const slotGroups = dates.map((date) => {
-      const dayStart = wallClockToUtcDate(date, 0, timeZone);
-      const dayEnd = wallClockToUtcDate(date, 24 * 60 - 1, timeZone);
+  const slotGroups = dates.flatMap((date) => {
+    const dayStart = wallClockToUtcDate(date, 0, timeZone);
+    const dayEnd = wallClockToUtcDate(date, 24 * 60 - 1, timeZone);
 
-      const windows = resolveDayWorkingWindows({
+    const dayAppointments = existing.filter((row) =>
+      rangesOverlap(
+        dayStart,
+        dayEnd,
+        new Date(row.starts_at),
+        new Date(row.ends_at),
+      ),
+    );
+
+    return activeStaff.flatMap((staffMember) => {
+      const windows = resolveDayWorkingWindowsForStaff({
         dateInput: date,
         timeZone,
         rules,
         exceptions,
-        staffMemberIds: activeStaffIds,
+        staffMemberId: staffMember.id,
       });
-      const dayAppointments = existing.filter((row) =>
-        rangesOverlap(
-          dayStart,
-          dayEnd,
-          new Date(row.starts_at),
-          new Date(row.ends_at),
-        ),
-      );
 
       const daySlots: CalendarAvailableSlot[] = [];
       for (const window of windows) {
@@ -347,12 +349,15 @@ export async function listCalendarAvailableSlots(
           const endsAt = new Date(startsAt.getTime() + slotDuration * 60_000);
 
           if (!options.includePast && startsAt.getTime() < Date.now()) continue;
-          if (isBlockedByOverride(startsAt, endsAt, overrides, primaryStaff.id)) {
+          if (
+            isBlockedByOverride(startsAt, endsAt, overrides, staffMember.id)
+          ) {
             continue;
           }
 
           const overlapsAppointment = dayAppointments.some(
             (row) =>
+              row.staff_member_id === staffMember.id &&
               row.id !== query.excludeAppointmentId &&
               rangesOverlap(
                 startsAt,
@@ -367,15 +372,16 @@ export async function listCalendarAvailableSlots(
             startsAt: startsAt.toISOString(),
             endsAt: endsAt.toISOString(),
             date,
-            staffMemberId: primaryStaff.id,
-            staffName: primaryStaff.name,
+            staffMemberId: staffMember.id,
+            staffName: staffMember.name,
           });
         }
       }
       return daySlots;
     });
+  });
 
-  return slotGroups.flat().sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+  return slotGroups.sort((a, b) => a.startsAt.localeCompare(b.startsAt));
 }
 
 /**

@@ -20,26 +20,67 @@ export function getDateAvailabilitySnapshot(
       row.exception_date === date &&
       (staffMemberId === null
         ? row.staff_member_id === null
-        : row.staff_member_id === staffMemberId),
+        : row.staff_member_id === null ||
+          row.staff_member_id === staffMemberId),
   );
 
   if (scoped.length === 0) {
     return { closed: false, ranges: [], hasDateSpecific: false };
   }
 
-  if (scoped.some((row) => row.closed)) {
+  const staffSpecificOpen = staffMemberId
+    ? scoped.filter(
+        (row) =>
+          !row.closed &&
+          row.staff_member_id === staffMemberId &&
+          row.start_time &&
+          row.end_time,
+      )
+    : scoped.filter(
+        (row) =>
+          !row.closed &&
+          row.staff_member_id === null &&
+          row.start_time &&
+          row.end_time,
+      );
+  const globalOpen = scoped.filter(
+    (row) =>
+      !row.closed &&
+      row.staff_member_id === null &&
+      row.start_time &&
+      row.end_time,
+  );
+  const openRows =
+    staffMemberId && staffSpecificOpen.length > 0
+      ? staffSpecificOpen
+      : staffMemberId
+        ? globalOpen
+        : globalOpen;
+
+  if (openRows.length > 0) {
+    const ranges = openRows
+      .map((row) => ({
+        start_time: normalizeTimeToHHMM(row.start_time!),
+        end_time: normalizeTimeToHHMM(row.end_time!),
+      }))
+      .sort((a, b) => a.start_time.localeCompare(b.start_time));
+    return { closed: false, ranges, hasDateSpecific: true };
+  }
+
+  const staffClosed =
+    staffMemberId &&
+    scoped.some(
+      (row) => row.closed && row.staff_member_id === staffMemberId,
+    );
+  const globalClosed = scoped.some(
+    (row) => row.closed && row.staff_member_id === null,
+  );
+
+  if (staffClosed || globalClosed) {
     return { closed: true, ranges: [], hasDateSpecific: true };
   }
 
-  const ranges = scoped
-    .filter((row) => row.start_time && row.end_time)
-    .map((row) => ({
-      start_time: normalizeTimeToHHMM(row.start_time!),
-      end_time: normalizeTimeToHHMM(row.end_time!),
-    }))
-    .sort((a, b) => a.start_time.localeCompare(b.start_time));
-
-  return { closed: false, ranges, hasDateSpecific: true };
+  return { closed: false, ranges: [], hasDateSpecific: true };
 }
 
 export function snapshotsMatch(

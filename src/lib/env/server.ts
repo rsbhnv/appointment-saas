@@ -13,11 +13,28 @@ const serverEnvSchema = z.object({
   TWILIO_ACCOUNT_SID: z.string().min(1).optional(),
   TWILIO_AUTH_TOKEN: z.string().min(1).optional(),
   TWILIO_PHONE_NUMBER: z.string().min(1).optional(),
-  CRON_SECRET: z.string().min(16).optional(),
+  CRON_SECRET: z.string().min(1).optional(),
 });
 
 function shouldSkipValidation(): boolean {
   return process.env.SKIP_ENV_VALIDATION === "true";
+}
+
+const CRON_SECRET_MIN_LENGTH = 16;
+
+function normalizeOptionalSecret(
+  name: string,
+  value: string | undefined,
+  minLength: number,
+): string | undefined {
+  if (!value) return undefined;
+  if (value.length < minLength) {
+    console.warn(
+      `[env] ${name} must be at least ${minLength} characters — related features stay disabled until fixed.`,
+    );
+    return undefined;
+  }
+  return value;
 }
 
 function parseServerEnv() {
@@ -36,7 +53,14 @@ function parseServerEnv() {
     throw new Error("Invalid server environment variables");
   }
 
-  return parsed.data;
+  return {
+    ...parsed.data,
+    CRON_SECRET: normalizeOptionalSecret(
+      "CRON_SECRET",
+      parsed.data.CRON_SECRET,
+      CRON_SECRET_MIN_LENGTH,
+    ),
+  };
 }
 
 const env = parseServerEnv();
@@ -59,17 +83,24 @@ export type TwilioConfig = {
 
 export function isTwilioConfigured(): boolean {
   return Boolean(
-    env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_PHONE_NUMBER,
+    process.env.TWILIO_ACCOUNT_SID &&
+      process.env.TWILIO_AUTH_TOKEN &&
+      process.env.TWILIO_PHONE_NUMBER,
   );
 }
 
 export function getTwilioConfig(): TwilioConfig | null {
-  if (!isTwilioConfigured()) return null;
-  return {
-    accountSid: env.TWILIO_ACCOUNT_SID!,
-    authToken: env.TWILIO_AUTH_TOKEN!,
-    phoneNumber: env.TWILIO_PHONE_NUMBER!,
-  };
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const phoneNumber = process.env.TWILIO_PHONE_NUMBER;
+  if (!accountSid || !authToken || !phoneNumber) return null;
+  return { accountSid, authToken, phoneNumber };
+}
+
+if (env.NODE_ENV === "development" && !shouldSkipValidation() && !isTwilioConfigured()) {
+  console.warn(
+    "[env] Twilio SMS is not configured — set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER in .env.local, then restart the dev server.",
+  );
 }
 
 export function isCronAuthorized(authHeader: string | null): boolean {

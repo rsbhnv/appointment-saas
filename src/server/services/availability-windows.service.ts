@@ -42,45 +42,104 @@ export type ResolveDayWindowsInput = {
   staffMemberIds: Set<string>;
 };
 
+function mapOpenExceptionRows(
+  rows: AvailabilityException[],
+): WorkingHoursWindow[] {
+  return rows
+    .map((row) => ({
+      startMinutes: parseTimeToMinutes(row.start_time!),
+      endMinutes: parseTimeToMinutes(row.end_time!),
+    }))
+    .sort((a, b) => a.startMinutes - b.startMinutes);
+}
+
 /**
- * Date-specific exceptions override weekly rules for that calendar day.
- * Multiple exception rows on the same date define multiple working windows.
- * A "closed" row on the date blocks the entire day.
+ * Resolves working windows for one staff member on a calendar day.
+ * Staff-specific open ranges override a global "closed" row on the same date.
  */
-export function resolveDayWorkingWindows(
-  input: ResolveDayWindowsInput,
+export function resolveDayWorkingWindowsForStaff(
+  input: Omit<ResolveDayWindowsInput, "staffMemberIds"> & {
+    staffMemberId: string;
+  },
 ): WorkingHoursWindow[] {
   const timeZone = input.timeZone ?? DEFAULT_CALENDAR_TIMEZONE;
   const dayExceptions = input.exceptions.filter(
     (row) =>
       row.exception_date === input.dateInput &&
       (row.staff_member_id === null ||
-        input.staffMemberIds.has(row.staff_member_id)),
+        row.staff_member_id === input.staffMemberId),
   );
 
-  if (dayExceptions.some((row) => row.closed)) {
+  const staffSpecificOpen = dayExceptions.filter(
+    (row) =>
+      !row.closed &&
+      row.staff_member_id === input.staffMemberId &&
+      row.start_time &&
+      row.end_time,
+  );
+  const globalOpen = dayExceptions.filter(
+    (row) =>
+      !row.closed &&
+      row.staff_member_id === null &&
+      row.start_time &&
+      row.end_time,
+  );
+  const openRows =
+    staffSpecificOpen.length > 0 ? staffSpecificOpen : globalOpen;
+
+  if (openRows.length > 0) {
+    return mapOpenExceptionRows(openRows);
+  }
+
+  if (
+    dayExceptions.some(
+      (row) => row.closed && row.staff_member_id === input.staffMemberId,
+    )
+  ) {
     return [];
   }
 
-  const openRanges = dayExceptions.filter(
-    (row) => row.start_time && row.end_time,
-  );
-  if (openRanges.length > 0) {
-    return openRanges
-      .map((row) => ({
-        startMinutes: parseTimeToMinutes(row.start_time!),
-        endMinutes: parseTimeToMinutes(row.end_time!),
-      }))
-      .sort((a, b) => a.startMinutes - b.startMinutes);
+  if (
+    dayExceptions.some((row) => row.closed && row.staff_member_id === null)
+  ) {
+    return [];
   }
 
   const dayOfWeek = getIsoDayOfWeekForDateInput(input.dateInput, timeZone);
   const ruleWindows = workingWindowsFromRules(
     input.rules,
     dayOfWeek,
-    input.staffMemberIds,
+    new Set([input.staffMemberId]),
   );
   return ruleWindows.length > 0 ? ruleWindows : DEFAULT_WINDOWS;
+}
+
+/**
+ * Date-specific exceptions override weekly rules for that calendar day.
+ * When multiple staff ids are supplied, windows for each staff member are merged.
+ */
+export function resolveDayWorkingWindows(
+  input: ResolveDayWindowsInput,
+): WorkingHoursWindow[] {
+  if (input.staffMemberIds.size === 1) {
+    const staffMemberId = [...input.staffMemberIds][0]!;
+    return resolveDayWorkingWindowsForStaff({
+      ...input,
+      staffMemberId,
+    });
+  }
+
+  const merged: WorkingHoursWindow[] = [];
+  for (const staffMemberId of input.staffMemberIds) {
+    merged.push(
+      ...resolveDayWorkingWindowsForStaff({
+        ...input,
+        staffMemberId,
+      }),
+    );
+  }
+
+  return merged.sort((a, b) => a.startMinutes - b.startMinutes);
 }
 
 export function exceptionsByDate(

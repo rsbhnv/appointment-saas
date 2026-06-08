@@ -16,14 +16,7 @@ function getDevInsecureAgent(): Agent {
   return devInsecureAgent;
 }
 
-export function getSupabaseFetch(): typeof fetch | undefined {
-  if (
-    process.env.NODE_ENV !== "development" ||
-    process.env.SUPABASE_INSECURE_TLS !== "true"
-  ) {
-    return undefined;
-  }
-
+function createDevInsecureFetch(): typeof fetch {
   const agent = getDevInsecureAgent();
   const insecureFetch: typeof fetch = async (input, init) => {
     const response = await undiciFetch(input as string | URL, {
@@ -32,6 +25,20 @@ export function getSupabaseFetch(): typeof fetch | undefined {
     } as UndiciRequestInit);
     return response as unknown as Response;
   };
-
   return insecureFetch;
+}
+
+/** Dev-only fetch when corporate proxy breaks TLS (Supabase, Twilio, etc.). */
+export function getDevInsecureFetch(): typeof fetch | undefined {
+  if (
+    process.env.NODE_ENV !== "development" ||
+    process.env.SUPABASE_INSECURE_TLS !== "true"
+  ) {
+    return undefined;
+  }
+  return createDevInsecureFetch();
+}
+
+export function getSupabaseFetch(): typeof fetch | undefined {
+  return getDevInsecureFetch();
 }

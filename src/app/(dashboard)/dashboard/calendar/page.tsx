@@ -47,11 +47,14 @@ export default async function CalendarPage() {
       from: from.toISOString(),
       to: to.toISOString(),
     }),
-    listCalendarAvailableSlots({
-      businessId: membership.businessId,
-      from: from.toISOString(),
-      to: to.toISOString(),
-    }),
+    listCalendarAvailableSlots(
+      {
+        businessId: membership.businessId,
+        from: from.toISOString(),
+        to: to.toISOString(),
+      },
+      { includePast: true },
+    ),
     listPublicActiveServicesByBusinessId(membership.businessId),
     listStaffByBusinessId(membership.businessId),
   ]);

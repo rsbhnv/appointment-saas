@@ -49,6 +49,10 @@ type DayScheduleItem =
   | { kind: "appointment"; appointment: CalendarAppointment }
   | { kind: "slot"; slot: CalendarAvailableSlot };
 
+function slotItemKey(slot: CalendarAvailableSlot): string {
+  return `${slot.startsAt}|${slot.endsAt}|${slot.staffMemberId ?? ""}`;
+}
+
 function itemsForDate(
   date: string,
   appointments: CalendarAppointment[],
@@ -68,9 +72,17 @@ function itemsForDate(
     return true;
   });
 
+  const seenSlotKeys = new Set<string>();
+  const uniqueDaySlots = daySlots.filter((row) => {
+    const key = slotItemKey(row);
+    if (seenSlotKeys.has(key)) return false;
+    seenSlotKeys.add(key);
+    return true;
+  });
+
   const items: DayScheduleItem[] = [
     ...dayAppointments.map((appointment) => ({ kind: "appointment" as const, appointment })),
-    ...daySlots.map((slot) => ({ kind: "slot" as const, slot })),
+    ...uniqueDaySlots.map((slot) => ({ kind: "slot" as const, slot })),
   ];
 
   return items.sort((a, b) => {
@@ -256,7 +268,7 @@ export function AvailabilitySchedulePanel({
                       </li>
                     ) : (
                       <li
-                        key={item.slot.startsAt}
+                        key={slotItemKey(item.slot)}
                         className="flex items-start gap-3 rounded-lg border border-dashed border-secondary/40 bg-secondary/5 p-3 select-none"
                         aria-hidden={false}
                       >

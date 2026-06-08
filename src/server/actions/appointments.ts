@@ -129,12 +129,15 @@ export async function listCalendarAvailableSlotsAction(
     const parsed = AvailabilitySlotsSchema.safeParse(input ?? {});
     if (!parsed.success) return { ok: false, error: "invalid_input" };
 
-    const slots = await listCalendarAvailableSlots({
-      businessId: membership.businessId,
-      from: parsed.data.from,
-      to: parsed.data.to,
-      staffMemberId: parsed.data.staffMemberId,
-    });
+    const slots = await listCalendarAvailableSlots(
+      {
+        businessId: membership.businessId,
+        from: parsed.data.from,
+        to: parsed.data.to,
+        staffMemberId: parsed.data.staffMemberId,
+      },
+      { includePast: true },
+    );
     return { ok: true, slots };
   } catch (err) {
     if (err instanceof GuardError) return { ok: false, error: err.code };

@@ -53,11 +53,14 @@ export default async function AvailabilityPage() {
         from: scheduleFrom.toISOString(),
         to: scheduleTo.toISOString(),
       }),
-      listCalendarAvailableSlots({
-        businessId: membership.businessId,
-        from: scheduleFrom.toISOString(),
-        to: scheduleTo.toISOString(),
-      }),
+      listCalendarAvailableSlots(
+        {
+          businessId: membership.businessId,
+          from: scheduleFrom.toISOString(),
+          to: scheduleTo.toISOString(),
+        },
+        { includePast: true },
+      ),
     ]);
 
   const blockRows = blocks.filter((row) => row.override_type === "block");
