@@ -41,6 +41,11 @@ import {
 import { saveDateAvailabilityAction } from "@/server/actions/availability";
 import type { AvailabilityException } from "@/server/repositories/availability";
 import type { StaffMember } from "@/server/repositories/staff-members";
+import {
+  resolveAvailabilityStaffScope,
+  showAvailabilityStaffSelector,
+  soleActiveStaffMemberId,
+} from "@/lib/availability/staff-scope";
 
 type AvailabilityCalendarTabProps = {
   exceptions: AvailabilityException[];
@@ -82,7 +87,13 @@ export function AvailabilityCalendarTab({
   const [isPending, startTransition] = useTransition();
   const [scheduleLoading, setScheduleLoading] = useState(false);
 
-  const staffScope = staffMemberId || null;
+  const soleStaffId = useMemo(() => soleActiveStaffMemberId(staff), [staff]);
+  const showStaffSelector = useMemo(
+    () => showAvailabilityStaffSelector(staff),
+    [staff],
+  );
+  const effectiveStaffId = soleStaffId ?? staffMemberId;
+  const staffScope = resolveAvailabilityStaffScope(staffMemberId, soleStaffId);
 
   const refreshSchedule = useCallback(() => {
     const { from, to } = monthRange(anchorDate);
@@ -92,32 +103,32 @@ export function AvailabilityCalendarTab({
         listAppointmentsAction({
           from: from.toISOString(),
           to: to.toISOString(),
-          staffMemberId: staffMemberId || undefined,
+          staffMemberId: effectiveStaffId || undefined,
         }),
         listCalendarAvailableSlotsAction({
           from: from.toISOString(),
           to: to.toISOString(),
-          staffMemberId: staffMemberId || undefined,
+          staffMemberId: effectiveStaffId || undefined,
         }),
       ]);
       if (appointmentsResult.ok) setAppointments(appointmentsResult.appointments);
       if (slotsResult.ok) setAvailableSlots(slotsResult.slots);
       setScheduleLoading(false);
     });
-  }, [anchorDate, staffMemberId]);
+  }, [anchorDate, effectiveStaffId]);
 
   useEffect(() => {
     refreshSchedule();
   }, [refreshSchedule]);
 
   const appointmentCounts = useMemo(
-    () => countAppointmentsByDate(appointments, staffMemberId),
-    [appointments, staffMemberId],
+    () => countAppointmentsByDate(appointments, effectiveStaffId),
+    [appointments, effectiveStaffId],
   );
 
   const slotCounts = useMemo(
-    () => countSlotsByDate(availableSlots, staffMemberId),
-    [availableSlots, staffMemberId],
+    () => countSlotsByDate(availableSlots, effectiveStaffId),
+    [availableSlots, effectiveStaffId],
   );
 
   const dateMeta = useMemo(() => {
@@ -238,7 +249,7 @@ export function AvailabilityCalendarTab({
         total +
         availableSlots.filter((row) => {
           if (row.date !== date) return false;
-          if (staffMemberId && row.staffMemberId !== staffMemberId) return false;
+          if (effectiveStaffId && row.staffMemberId !== effectiveStaffId) return false;
           return true;
         }).length
       );
@@ -320,6 +331,7 @@ export function AvailabilityCalendarTab({
           closed={closed}
           staffMemberId={staffMemberId}
           staff={staff}
+          showStaffSelector={showStaffSelector}
           canManage={canManage}
           isPending={isPending}
           error={error}
@@ -346,7 +358,7 @@ export function AvailabilityCalendarTab({
         appointments={appointments}
         availableSlots={availableSlots}
         canManage={canManage}
-        staffMemberId={staffMemberId}
+        staffMemberId={effectiveStaffId}
         closeDaysPending={isPending}
         onCloseSelectedDays={closeSelectedDaysRemoveFreeSlots}
         onScheduleChange={() => {

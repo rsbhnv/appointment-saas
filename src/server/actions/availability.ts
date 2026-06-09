@@ -7,6 +7,7 @@ import { GuardError } from "@/server/guards";
 import { requireBusinessMember } from "@/server/guards/business-member";
 import { validateTimeRanges } from "@/lib/availability/ranges";
 import {
+  clearConflictingAvailabilityRules,
   createAvailabilityException,
   createAvailabilityRule,
   createSlotOverride,
@@ -17,6 +18,10 @@ import {
   updateAvailabilityException,
   updateAvailabilityRule,
 } from "@/server/repositories/availability";
+import {
+  resolveAvailabilityStaffMemberId,
+  soleActiveStaffMemberId,
+} from "@/server/services/availability-staff-scope.service";
 import { withAudit } from "@/server/services/with-audit";
 
 import { actionError, type ActionResult } from "./action-result";
@@ -97,8 +102,24 @@ export const createAvailabilityRuleAction = withAudit(
         return actionError("invalid_input");
       }
 
+      const staffMemberId = await resolveAvailabilityStaffMemberId(
+        membership.businessId,
+        parsed.data.staff_member_id,
+      );
+      const singleStaffBusiness = Boolean(
+        await soleActiveStaffMemberId(membership.businessId),
+      );
+
+      await clearConflictingAvailabilityRules(membership.businessId, {
+        dayOfWeek: parsed.data.day_of_week,
+        startTime: parsed.data.start_time,
+        endTime: parsed.data.end_time,
+        staffMemberId,
+        singleStaffBusiness,
+      });
+
       const rule = await createAvailabilityRule(membership.businessId, {
-        staff_member_id: parsed.data.staff_member_id ?? null,
+        staff_member_id: staffMemberId,
         day_of_week: parsed.data.day_of_week,
         start_time: parsed.data.start_time,
         end_time: parsed.data.end_time,
@@ -136,8 +157,25 @@ export const updateAvailabilityRuleAction = withAudit(
         return actionError("invalid_input");
       }
 
+      const staffMemberId = await resolveAvailabilityStaffMemberId(
+        membership.businessId,
+        parsed.data.staff_member_id,
+      );
+      const singleStaffBusiness = Boolean(
+        await soleActiveStaffMemberId(membership.businessId),
+      );
+
+      await clearConflictingAvailabilityRules(membership.businessId, {
+        dayOfWeek: parsed.data.day_of_week,
+        startTime: parsed.data.start_time,
+        endTime: parsed.data.end_time,
+        staffMemberId,
+        excludeRuleId: parsed.data.id,
+        singleStaffBusiness,
+      });
+
       await updateAvailabilityRule(membership.businessId, parsed.data.id, {
-        staff_member_id: parsed.data.staff_member_id ?? null,
+        staff_member_id: staffMemberId,
         day_of_week: parsed.data.day_of_week,
         start_time: parsed.data.start_time,
         end_time: parsed.data.end_time,
@@ -208,8 +246,13 @@ export const createAvailabilityExceptionAction = withAudit(
         return actionError("invalid_input");
       }
 
+      const staffMemberId = await resolveAvailabilityStaffMemberId(
+        membership.businessId,
+        parsed.data.staff_member_id,
+      );
+
       const row = await createAvailabilityException(membership.businessId, {
-        staff_member_id: parsed.data.staff_member_id ?? null,
+        staff_member_id: staffMemberId,
         exception_date: parsed.data.exception_date,
         closed: parsed.data.closed,
         start_time: parsed.data.closed ? null : parsed.data.start_time ?? null,
@@ -245,8 +288,13 @@ export const updateAvailabilityExceptionAction = withAudit(
       const parsed = UpdateExceptionSchema.safeParse(input);
       if (!parsed.success) return actionError("invalid_input");
 
+      const staffMemberId = await resolveAvailabilityStaffMemberId(
+        membership.businessId,
+        parsed.data.staff_member_id,
+      );
+
       await updateAvailabilityException(membership.businessId, parsed.data.id, {
-        staff_member_id: parsed.data.staff_member_id ?? null,
+        staff_member_id: staffMemberId,
         exception_date: parsed.data.exception_date,
         closed: parsed.data.closed,
         start_time: parsed.data.closed ? null : parsed.data.start_time ?? null,
@@ -279,7 +327,14 @@ export const saveDateAvailabilityAction = withAudit(
       const parsed = SaveDateAvailabilitySchema.safeParse(input);
       if (!parsed.success) return actionError("invalid_input");
 
-      const staffMemberId = parsed.data.staff_member_id ?? null;
+      const staffMemberId = await resolveAvailabilityStaffMemberId(
+        membership.businessId,
+        parsed.data.staff_member_id,
+      );
+      const singleStaffBusiness = Boolean(
+        await soleActiveStaffMemberId(membership.businessId),
+      );
+      const replaceOptions = { singleStaffBusiness };
 
       if (parsed.data.use_weekly_schedule) {
         await replaceDateAvailabilityExceptions(
@@ -287,6 +342,7 @@ export const saveDateAvailabilityAction = withAudit(
           parsed.data.dates,
           staffMemberId,
           { closed: false, ranges: [], reason: null },
+          replaceOptions,
         );
         revalidateAvailability();
         return { ok: true, businessId: membership.businessId, userId: user.id };
@@ -298,6 +354,7 @@ export const saveDateAvailabilityAction = withAudit(
           parsed.data.dates,
           staffMemberId,
           { closed: true, ranges: [], reason: parsed.data.reason ?? null },
+          replaceOptions,
         );
         revalidateAvailability();
         return { ok: true, businessId: membership.businessId, userId: user.id };
@@ -323,6 +380,7 @@ export const saveDateAvailabilityAction = withAudit(
           ranges: validated.ranges,
           reason: parsed.data.reason ?? null,
         },
+        replaceOptions,
       );
 
       revalidateAvailability();
@@ -386,8 +444,13 @@ export const createSlotBlockAction = withAudit(
         return actionError("invalid_input");
       }
 
+      const staffMemberId = await resolveAvailabilityStaffMemberId(
+        membership.businessId,
+        parsed.data.staff_member_id,
+      );
+
       const row = await createSlotOverride(membership.businessId, {
-        staff_member_id: parsed.data.staff_member_id ?? null,
+        staff_member_id: staffMemberId,
         starts_at: startsAt.toISOString(),
         ends_at: endsAt.toISOString(),
         override_type: "block",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -35,6 +35,11 @@ import type {
   CalendarAvailableSlot,
 } from "@/lib/calendar/types";
 import { toDateInputValue } from "@/lib/calendar/utils";
+import {
+  resolveAvailabilityStaffScope,
+  showAvailabilityStaffSelector,
+  soleActiveStaffMemberId,
+} from "@/lib/availability/staff-scope";
 
 const ERROR_COPY: Record<string, string> = {
   invalid_input: "פרטים לא תקינים.",
@@ -83,6 +88,12 @@ export function AvailabilityManager({
   const [slotSettingsMessage, setSlotSettingsMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const soleStaffId = useMemo(() => soleActiveStaffMemberId(staff), [staff]);
+  const showStaffSelector = useMemo(
+    () => showAvailabilityStaffSelector(staff),
+    [staff],
+  );
+
   const [slotSettingsForm, setSlotSettingsForm] = useState({
     default_slot_duration_minutes: String(
       settings?.default_slot_duration_minutes ?? 60,
@@ -125,7 +136,10 @@ export function AvailabilityManager({
   function submitRule() {
     setError(null);
     const payload = {
-      staff_member_id: ruleForm.staff_member_id || null,
+      staff_member_id: resolveAvailabilityStaffScope(
+        ruleForm.staff_member_id,
+        soleStaffId,
+      ),
       day_of_week: Number(ruleForm.day_of_week),
       start_time: ruleForm.start_time,
       end_time: ruleForm.end_time,
@@ -150,7 +164,10 @@ export function AvailabilityManager({
     const endsAt = new Date(`${blockForm.date}T${blockForm.end_time}`);
     startTransition(async () => {
       const result = await createSlotBlockAction({
-        staff_member_id: blockForm.staff_member_id || null,
+        staff_member_id: resolveAvailabilityStaffScope(
+          blockForm.staff_member_id,
+          soleStaffId,
+        ),
         starts_at: startsAt.toISOString(),
         ends_at: endsAt.toISOString(),
         reason: blockForm.reason || null,
@@ -319,17 +336,19 @@ export function AvailabilityManager({
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4 pt-6 sm:grid-cols-2">
-                <Field label="איש צוות (אופציונלי)">
-                  <select
-                    className="flex h-10 w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 text-sm"
-                    value={ruleForm.staff_member_id}
-                    onChange={(e) =>
-                      setRuleForm((f) => ({ ...f, staff_member_id: e.target.value }))
-                    }
-                  >
-                    {staffOptions("כל הצוות")}
-                  </select>
-                </Field>
+                {showStaffSelector ? (
+                  <Field label="איש צוות (אופציונלי)">
+                    <select
+                      className="flex h-10 w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 text-sm"
+                      value={ruleForm.staff_member_id}
+                      onChange={(e) =>
+                        setRuleForm((f) => ({ ...f, staff_member_id: e.target.value }))
+                      }
+                    >
+                      {staffOptions("כל הצוות")}
+                    </select>
+                  </Field>
+                ) : null}
                 <Field label="יום">
                   <select
                     className="flex h-10 w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 text-sm"
@@ -389,7 +408,7 @@ export function AvailabilityManager({
                       onClick={() =>
                         setRuleForm({
                           id: "",
-                          staff_member_id: "",
+                          staff_member_id: soleStaffId ?? "",
                           day_of_week: "1",
                           start_time: "09:00",
                           end_time: "17:00",
@@ -427,10 +446,12 @@ export function AvailabilityManager({
                         · {rule.start_time.slice(0, 5)}–{rule.end_time.slice(0, 5)}
                       </p>
                       <p className="text-on-surface-variant">
-                        {rule.staff_member_id
-                          ? staff.find((s) => s.id === rule.staff_member_id)?.name ??
-                            "צוות"
-                          : "כל הצוות"}
+                        {showStaffSelector
+                          ? rule.staff_member_id
+                            ? staff.find((s) => s.id === rule.staff_member_id)?.name ??
+                              "צוות"
+                            : "כל הצוות"
+                          : null}
                         {!rule.active ? " · לא פעיל" : ""}
                       </p>
                     </div>
@@ -491,17 +512,19 @@ export function AvailabilityManager({
                     }
                   />
                 </Field>
-                <Field label="איש צוות (אופציונלי)">
-                  <select
-                    className="flex h-10 w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 text-sm"
-                    value={blockForm.staff_member_id}
-                    onChange={(e) =>
-                      setBlockForm((f) => ({ ...f, staff_member_id: e.target.value }))
-                    }
-                  >
-                    {staffOptions("כל הצוות")}
-                  </select>
-                </Field>
+                {showStaffSelector ? (
+                  <Field label="איש צוות (אופציונלי)">
+                    <select
+                      className="flex h-10 w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 text-sm"
+                      value={blockForm.staff_member_id}
+                      onChange={(e) =>
+                        setBlockForm((f) => ({ ...f, staff_member_id: e.target.value }))
+                      }
+                    >
+                      {staffOptions("כל הצוות")}
+                    </select>
+                  </Field>
+                ) : null}
                 <Field label="מ">
                   <Input
                     type="time"
@@ -551,10 +574,12 @@ export function AvailabilityManager({
                     <div>
                       <p className="font-medium">{formatRange(row.starts_at, row.ends_at)}</p>
                       <p className="text-on-surface-variant">
-                        {row.staff_member_id
-                          ? staff.find((s) => s.id === row.staff_member_id)?.name
-                          : "כל הצוות"}
-                        {row.reason ? ` · ${row.reason}` : ""}
+                        {showStaffSelector
+                          ? row.staff_member_id
+                            ? staff.find((s) => s.id === row.staff_member_id)?.name
+                            : "כל הצוות"
+                          : null}
+                        {row.reason ? `${showStaffSelector ? " · " : ""}${row.reason}` : ""}
                       </p>
                     </div>
                     {canManage ? (

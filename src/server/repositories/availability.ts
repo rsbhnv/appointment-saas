@@ -100,6 +100,60 @@ export async function deleteAvailabilityRule(
   if (error) throw new Error(`availability_rules delete failed: ${error.message}`);
 }
 
+type ClearConflictingRulesInput = {
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  staffMemberId: string | null;
+  excludeRuleId?: string;
+  singleStaffBusiness?: boolean;
+};
+
+/** Removes global/staff duplicate weekly rules before save. */
+export async function clearConflictingAvailabilityRules(
+  businessId: string,
+  input: ClearConflictingRulesInput,
+): Promise<void> {
+  if (isDemoMode) throw new Error("availability not supported in demo mode");
+  const supabase = await createSupabaseServerClient();
+
+  const base = () =>
+    supabase
+      .from("availability_rules")
+      .delete()
+      .eq("business_id", businessId)
+      .eq("day_of_week", input.dayOfWeek)
+      .eq("start_time", input.startTime)
+      .eq("end_time", input.endTime);
+
+  if (input.singleStaffBusiness) {
+    let query = base();
+    if (input.excludeRuleId) {
+      query = query.neq("id", input.excludeRuleId);
+    }
+    const { error } = await query;
+    if (error) {
+      throw new Error(
+        `availability_rules conflict cleanup failed: ${error.message}`,
+      );
+    }
+    return;
+  }
+
+  if (input.staffMemberId) {
+    let globalQuery = base().is("staff_member_id", null);
+    if (input.excludeRuleId) {
+      globalQuery = globalQuery.neq("id", input.excludeRuleId);
+    }
+    const { error: globalError } = await globalQuery;
+    if (globalError) {
+      throw new Error(
+        `availability_rules global cleanup failed: ${globalError.message}`,
+      );
+    }
+  }
+}
+
 export async function createAvailabilityException(
   businessId: string,
   input: Omit<TablesInsert<"availability_exceptions">, "business_id" | "id">,
@@ -165,27 +219,55 @@ export async function replaceDateAvailabilityExceptions(
   dates: string[],
   staffMemberId: string | null,
   payload: ReplaceDateAvailabilityInput,
+  options: { singleStaffBusiness?: boolean } = {},
 ): Promise<void> {
   if (isDemoMode) throw new Error("availability not supported in demo mode");
   if (dates.length === 0) return;
 
   const supabase = await createSupabaseServerClient();
 
-  let deleteQuery = supabase
-    .from("availability_exceptions")
-    .delete()
-    .eq("business_id", businessId)
-    .in("exception_date", dates);
+  if (options.singleStaffBusiness) {
+    const { error: deleteAllError } = await supabase
+      .from("availability_exceptions")
+      .delete()
+      .eq("business_id", businessId)
+      .in("exception_date", dates);
+    if (deleteAllError) {
+      throw new Error(
+        `availability_exceptions bulk delete failed: ${deleteAllError.message}`,
+      );
+    }
+  } else {
+    if (staffMemberId) {
+      const { error: deleteGlobalError } = await supabase
+        .from("availability_exceptions")
+        .delete()
+        .eq("business_id", businessId)
+        .in("exception_date", dates)
+        .is("staff_member_id", null);
+      if (deleteGlobalError) {
+        throw new Error(
+          `availability_exceptions global cleanup failed: ${deleteGlobalError.message}`,
+        );
+      }
+    }
 
-  deleteQuery = staffMemberId
-    ? deleteQuery.eq("staff_member_id", staffMemberId)
-    : deleteQuery.is("staff_member_id", null);
+    let deleteQuery = supabase
+      .from("availability_exceptions")
+      .delete()
+      .eq("business_id", businessId)
+      .in("exception_date", dates);
 
-  const { error: deleteError } = await deleteQuery;
-  if (deleteError) {
-    throw new Error(
-      `availability_exceptions bulk delete failed: ${deleteError.message}`,
-    );
+    deleteQuery = staffMemberId
+      ? deleteQuery.eq("staff_member_id", staffMemberId)
+      : deleteQuery.is("staff_member_id", null);
+
+    const { error: deleteError } = await deleteQuery;
+    if (deleteError) {
+      throw new Error(
+        `availability_exceptions bulk delete failed: ${deleteError.message}`,
+      );
+    }
   }
 
   if (payload.closed) {

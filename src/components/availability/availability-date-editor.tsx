@@ -22,6 +22,7 @@ type AvailabilityDateEditorProps = {
   closed: boolean;
   staffMemberId: string;
   staff: StaffMember[];
+  showStaffSelector: boolean;
   canManage: boolean;
   isPending: boolean;
   error: string | null;
@@ -41,6 +42,7 @@ export function AvailabilityDateEditor({
   closed,
   staffMemberId,
   staff,
+  showStaffSelector,
   canManage,
   isPending,
   error,
@@ -96,20 +98,22 @@ export function AvailabilityDateEditor({
 
             {canManage ? (
               <>
-                <Field label="איש צוות (אופציונלי)">
-                  <select
-                    className="flex h-10 w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 text-sm"
-                    value={staffMemberId}
-                    onChange={(e) => onStaffChange(e.target.value)}
-                  >
-                    <option value="">כל הצוות / הקליניקה</option>
-                    {staff.map((member) => (
-                      <option key={member.id} value={member.id}>
-                        {member.name}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
+                {showStaffSelector ? (
+                  <Field label="איש צוות (אופציונלי)">
+                    <select
+                      className="flex h-10 w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 text-sm"
+                      value={staffMemberId}
+                      onChange={(e) => onStaffChange(e.target.value)}
+                    >
+                      <option value="">כל הצוות / הקליניקה</option>
+                      {staff.map((member) => (
+                        <option key={member.id} value={member.id}>
+                          {member.name}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                ) : null}
 
                 <label className="flex items-center gap-2 text-sm">
                   <input
