@@ -25,6 +25,8 @@ import type { Business } from "@/server/repositories/businesses";
 const ERROR_COPY: Record<string, string> = {
   invalid_input: "פרטים לא תקינים.",
   forbidden: "רק בעל העסק יכול לעדכן הגדרות.",
+  schema_outdated:
+    "חסר עדכון במסד הנתונים. הריצי את migration המגבלות ב-Supabase (ראי הוראות למטה) ונסי שוב.",
   unknown: "אירעה שגיאה. נסה שוב.",
 };
 

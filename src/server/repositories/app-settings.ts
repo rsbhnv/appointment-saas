@@ -32,11 +32,32 @@ export async function upsertSettings(
     return demoSettingsStore.upsert(businessId, patch);
   }
   const supabase = await createSupabaseServerClient();
+
+  const { data: existing, error: lookupError } = await supabase
+    .from("app_settings")
+    .select("id")
+    .eq("business_id", businessId)
+    .maybeSingle();
+  if (lookupError) {
+    throw new Error(`app_settings lookup failed: ${lookupError.message}`);
+  }
+
+  if (existing) {
+    const { data, error } = await supabase
+      .from("app_settings")
+      .update(patch)
+      .eq("business_id", businessId)
+      .select("*")
+      .single();
+    if (error) throw new Error(`app_settings update failed: ${error.message}`);
+    return data;
+  }
+
   const { data, error } = await supabase
     .from("app_settings")
-    .upsert({ business_id: businessId, ...patch })
+    .insert({ business_id: businessId, ...patch })
     .select("*")
     .single();
-  if (error) throw new Error(`app_settings upsert failed: ${error.message}`);
+  if (error) throw new Error(`app_settings insert failed: ${error.message}`);
   return data;
 }

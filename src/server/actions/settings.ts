@@ -180,6 +180,18 @@ export const updateBookingSettingsAction = withAudit(
       return { ok: true, businessId: membership.businessId, userId: user.id };
     } catch (err) {
       if (err instanceof GuardError) return actionError(err.code);
+      if (err instanceof Error) {
+        const message = err.message.toLowerCase();
+        if (
+          message.includes("limit_one_booking") ||
+          message.includes("max_appointments_per_customer_per_week") ||
+          message.includes("max_appointments_per_customer_per_month") ||
+          message.includes("schema cache") ||
+          message.includes("does not exist")
+        ) {
+          return actionError("schema_outdated");
+        }
+      }
       return actionError("unknown");
     }
   },
