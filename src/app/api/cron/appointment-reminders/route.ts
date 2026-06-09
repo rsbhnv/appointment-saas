@@ -6,7 +6,7 @@ import { processAppointmentReminders } from "@/server/services/appointment-sms.s
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-/** Hourly cron: send 24-hour appointment reminder SMS. */
+/** Daily cron (Vercel Hobby): send 24-hour appointment reminder SMS. */
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
   if (!isCronAuthorized(authHeader)) {

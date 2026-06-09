@@ -9,7 +9,7 @@ import { z } from "zod";
 const serverEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
-  AUTH_SECRET: z.string().min(32).optional(),
+  AUTH_SECRET: z.string().min(1).optional(),
   TWILIO_ACCOUNT_SID: z.string().min(1).optional(),
   TWILIO_AUTH_TOKEN: z.string().min(1).optional(),
   TWILIO_PHONE_NUMBER: z.string().min(1).optional(),
@@ -21,6 +21,7 @@ function shouldSkipValidation(): boolean {
 }
 
 const CRON_SECRET_MIN_LENGTH = 16;
+const AUTH_SECRET_MIN_LENGTH = 32;
 
 function normalizeOptionalSecret(
   name: string,
@@ -55,6 +56,11 @@ function parseServerEnv() {
 
   return {
     ...parsed.data,
+    AUTH_SECRET: normalizeOptionalSecret(
+      "AUTH_SECRET",
+      parsed.data.AUTH_SECRET,
+      AUTH_SECRET_MIN_LENGTH,
+    ),
     CRON_SECRET: normalizeOptionalSecret(
       "CRON_SECRET",
       parsed.data.CRON_SECRET,
