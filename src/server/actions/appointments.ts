@@ -27,7 +27,7 @@ import {
   listCalendarAvailableSlots,
   validateAppointmentSlot,
 } from "@/server/services/appointment-slot.service";
-import { scheduleBookingConfirmationSms } from "@/server/services/appointment-sms.service";
+import { sendBookingConfirmationSmsForAppointment } from "@/server/services/appointment-sms.service";
 import { withAudit } from "@/server/services/with-audit";
 import type { AppointmentStatus } from "@/types/database";
 
@@ -213,7 +213,7 @@ export const createManualAppointmentAction = withAudit(
       revalidatePath("/dashboard");
 
       if (parsed.data.status === "pending" || parsed.data.status === "confirmed") {
-        scheduleBookingConfirmationSms(appointment.id);
+        await sendBookingConfirmationSmsForAppointment(appointment.id);
       }
 
       return {

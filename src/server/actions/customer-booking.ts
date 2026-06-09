@@ -22,7 +22,7 @@ import {
   maxBookingDateString,
   validateAppointmentSlot,
 } from "@/server/services/appointment-slot.service";
-import { scheduleBookingConfirmationSms } from "@/server/services/appointment-sms.service";
+import { sendBookingConfirmationSmsForAppointment } from "@/server/services/appointment-sms.service";
 import { tenantService } from "@/server/services";
 import type { AvailableSlot } from "@/lib/calendar/types";
 import type { Appointment } from "@/server/repositories/appointments";
@@ -368,7 +368,7 @@ export async function bookCustomerAppointment(input: unknown): Promise<BookingRe
 
     revalidateBookingViews(parsed.data.businessSlug);
 
-    scheduleBookingConfirmationSms(appointment.id);
+    await sendBookingConfirmationSmsForAppointment(appointment.id);
 
     return { ok: true, appointmentId: appointment.id };
   } catch (err) {

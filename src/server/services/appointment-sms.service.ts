@@ -1,7 +1,5 @@
 import "server-only";
 
-import { after } from "next/server";
-
 import { formatHebrewDate, formatHebrewTime } from "@/lib/calendar/utils";
 import { isDemoMode } from "@/lib/env/client";
 import { isTwilioConfigured, isSupabaseAdminConfigured } from "@/lib/env/server";
@@ -100,19 +98,27 @@ async function deliverSms(
   return "sent";
 }
 
-/** Schedule booking confirmation SMS after the response is sent (Vercel-safe). */
+/**
+ * Send booking confirmation SMS — awaited so Vercel serverless completes before freeze.
+ * Booking success is not rolled back if SMS fails.
+ */
+export async function sendBookingConfirmationSmsForAppointment(
+  appointmentId: string,
+): Promise<void> {
+  console.info("[sms] booking_confirmation_start", { appointmentId });
+  try {
+    await sendBookingConfirmationSms(appointmentId);
+  } catch (err) {
+    console.error("[sms] booking_confirmation_unhandled", {
+      appointmentId,
+      error: err instanceof Error ? err.message : "unknown",
+    });
+  }
+}
+
+/** @deprecated Use sendBookingConfirmationSmsForAppointment (awaited). */
 export function scheduleBookingConfirmationSms(appointmentId: string): void {
-  console.info("[sms] booking_confirmation_scheduled", { appointmentId });
-  after(async () => {
-    try {
-      await sendBookingConfirmationSms(appointmentId);
-    } catch (err) {
-      console.error("[sms] booking_confirmation_unhandled", {
-        appointmentId,
-        error: err instanceof Error ? err.message : "unknown",
-      });
-    }
-  });
+  void sendBookingConfirmationSmsForAppointment(appointmentId);
 }
 
 export async function sendBookingConfirmationSms(appointmentId: string): Promise<void> {
