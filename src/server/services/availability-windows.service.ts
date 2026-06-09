@@ -42,6 +42,18 @@ export type ResolveDayWindowsInput = {
   staffMemberIds: Set<string>;
 };
 
+function dedupeOpenExceptionRows(
+  rows: AvailabilityException[],
+): AvailabilityException[] {
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    const key = `${row.start_time}|${row.end_time}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function mapOpenExceptionRows(
   rows: AvailabilityException[],
 ): WorkingHoursWindow[] {
@@ -117,8 +129,9 @@ export function resolveDayWorkingWindowsForStaff(
       row.start_time &&
       row.end_time,
   );
-  const openRows =
-    staffSpecificOpen.length > 0 ? staffSpecificOpen : globalOpen;
+  const openRows = dedupeOpenExceptionRows(
+    staffSpecificOpen.length > 0 ? staffSpecificOpen : globalOpen,
+  );
 
   if (openRows.length > 0) {
     return mapOpenExceptionRows(openRows);

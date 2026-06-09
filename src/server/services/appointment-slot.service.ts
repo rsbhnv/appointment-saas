@@ -381,7 +381,21 @@ export async function listCalendarAvailableSlots(
     });
   });
 
-  return slotGroups.sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+  return dedupeCalendarSlots(
+    slotGroups.sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
+  );
+}
+
+function dedupeCalendarSlots(
+  slots: CalendarAvailableSlot[],
+): CalendarAvailableSlot[] {
+  const seen = new Set<string>();
+  return slots.filter((slot) => {
+    const key = `${slot.staffMemberId ?? ""}|${slot.startsAt}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 /**

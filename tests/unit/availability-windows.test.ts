@@ -137,6 +137,46 @@ describe("resolveDayWorkingWindowsForStaff", () => {
       { startMinutes: 15 * 60, endMinutes: 17 * 60 },
     ]);
   });
+
+  it("dedupes identical global and staff date exceptions for the same day", () => {
+    const exceptions: AvailabilityException[] = [
+      {
+        id: "1",
+        business_id: "b1",
+        staff_member_id: STAFF_ID,
+        location_id: null,
+        exception_date: "2026-06-11",
+        closed: false,
+        start_time: "09:00:00",
+        end_time: "13:00:00",
+        reason: null,
+        created_at: "",
+        updated_at: "",
+      },
+      {
+        id: "2",
+        business_id: "b1",
+        staff_member_id: null,
+        location_id: null,
+        exception_date: "2026-06-11",
+        closed: false,
+        start_time: "09:00:00",
+        end_time: "13:00:00",
+        reason: null,
+        created_at: "",
+        updated_at: "",
+      },
+    ];
+
+    const windows = resolveDayWorkingWindowsForStaff({
+      dateInput: "2026-06-11",
+      rules: [],
+      exceptions,
+      staffMemberId: STAFF_ID,
+    });
+
+    expect(windows).toEqual([{ startMinutes: 9 * 60, endMinutes: 13 * 60 }]);
+  });
 });
 
 describe("getDateAvailabilitySnapshot", () => {

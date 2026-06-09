@@ -50,7 +50,7 @@ type DayScheduleItem =
   | { kind: "slot"; slot: CalendarAvailableSlot };
 
 function slotItemKey(slot: CalendarAvailableSlot): string {
-  return `${slot.startsAt}|${slot.endsAt}|${slot.staffMemberId ?? ""}`;
+  return `${slot.staffMemberId ?? ""}|${slot.startsAt}`;
 }
 
 function itemsForDate(
