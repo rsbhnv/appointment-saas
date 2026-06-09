@@ -16,11 +16,35 @@ export function addDays(date: Date, days: number): Date {
   return d;
 }
 
+/** Sunday = 0 … Saturday = 6 — matches Hebrew weekday header order (א׳ … ש׳). */
+export const HEBREW_WEEKDAY_HEADERS = [
+  "א׳",
+  "ב׳",
+  "ג׳",
+  "ד׳",
+  "ה׳",
+  "ו׳",
+  "ש׳",
+] as const;
+
+/** Index 0=Sunday … 6=Saturday for calendar column alignment. */
+export function getCalendarWeekdayIndex(date: Date): number {
+  return startOfDay(date).getDay();
+}
+
+/** Start of the Israeli/Hebrew week (Sunday), not ISO Monday. */
 export function startOfWeek(date: Date): Date {
   const d = startOfDay(date);
-  const day = d.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  return addDays(d, diff);
+  return addDays(d, -d.getDay());
+}
+
+/** Which weekday column (0–6) a date falls in for a month grid anchored to anchorMonth. */
+export function weekdayColumnInMonthGrid(date: Date, anchorMonth: Date): number {
+  const gridStart = startOfWeek(startOfMonth(anchorMonth));
+  const dayOffset = Math.round(
+    (startOfDay(date).getTime() - gridStart.getTime()) / 86_400_000,
+  );
+  return ((dayOffset % 7) + 7) % 7;
 }
 
 export function endOfWeek(date: Date): Date {

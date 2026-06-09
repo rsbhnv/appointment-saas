@@ -3,14 +3,13 @@
 import {
   addDays,
   formatHebrewDate,
+  HEBREW_WEEKDAY_HEADERS,
   startOfDay,
   startOfMonth,
   startOfWeek,
   toDateInputValue,
 } from "@/lib/calendar/utils";
 import { cn } from "@/lib/utils";
-
-const WEEKDAY_HEADERS = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"];
 
 export type DateCellMeta = {
   hasDateSpecific: boolean;
@@ -43,7 +42,7 @@ export function AvailabilityMonthGrid({
   return (
     <div className="space-y-2" dir="rtl">
       <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-on-surface-variant sm:gap-2">
-        {WEEKDAY_HEADERS.map((label) => (
+        {HEBREW_WEEKDAY_HEADERS.map((label) => (
           <div key={label} className="py-1">
             {label}
           </div>

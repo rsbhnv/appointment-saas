@@ -11,6 +11,7 @@ import {
   formatCompactCount,
   formatHebrewDate,
   formatHebrewTime,
+  HEBREW_WEEKDAY_HEADERS,
   startOfDay,
   startOfMonth,
   startOfWeek,
@@ -20,7 +21,6 @@ import { AppointmentCard } from "@/components/calendar/appointment-card";
 import { cn } from "@/lib/utils";
 
 const HOURS = Array.from({ length: 15 }, (_, i) => i + 8);
-const WEEKDAY_HEADERS = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"];
 const MONTH_CELL_APPOINTMENT_LIMIT = 3;
 const WEEK_CELL_APPOINTMENT_LIMIT = 4;
 
@@ -312,7 +312,7 @@ export function CalendarGridViews({
   return (
     <div className="space-y-2">
       <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-on-surface-variant sm:gap-2">
-        {WEEKDAY_HEADERS.map((label) => (
+        {HEBREW_WEEKDAY_HEADERS.map((label) => (
           <div key={label} className="py-1">
             {label}
           </div>

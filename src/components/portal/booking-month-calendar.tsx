@@ -7,13 +7,12 @@ import { Button } from "@/components/ui/button";
 import {
   addDays,
   formatHebrewMonthTitle,
+  HEBREW_WEEKDAY_HEADERS,
   startOfMonth,
   startOfWeek,
   toDateInputValue,
 } from "@/lib/calendar/utils";
 import { cn } from "@/lib/utils";
-
-const WEEKDAY_HEADERS = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"];
 
 type BookingMonthCalendarProps = {
   anchorMonth: Date;
@@ -87,7 +86,7 @@ export function BookingMonthCalendar({
       </div>
 
       <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-on-surface-variant">
-        {WEEKDAY_HEADERS.map((label) => (
+        {HEBREW_WEEKDAY_HEADERS.map((label) => (
           <div key={label} className="py-1">
             {label}
           </div>
