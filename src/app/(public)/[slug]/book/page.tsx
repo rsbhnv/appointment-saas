@@ -69,6 +69,7 @@ export default async function CustomerBookingPage({
           arrivalInstructions={business.arrival_instructions}
           paymentMethods={business.payment_methods}
           businessCurrency={business.currency}
+          businessTimezone={business.timezone}
           logoUrl={business.logo_url}
           services={services}
           staff={staff}

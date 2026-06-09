@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { extractFirstName } from "@/lib/customer/name";
 import { isValidPhone } from "@/lib/customer/phone";
+import { DEFAULT_CALENDAR_TIMEZONE } from "@/lib/calendar/timezone";
 import { customerBookingPath, customerMyAppointmentsPath } from "@/lib/tenant/customer-portal-paths";
 import { findSettingsByBusinessId } from "@/server/repositories/app-settings";
 import {
@@ -193,7 +194,10 @@ export async function getBookingMonthAvailabilityAction(
       },
       {
         minHoursBefore: minHours,
-        maxBookingDate: maxBookingDateString(bookingWindowDays),
+        maxBookingDate: maxBookingDateString(
+          bookingWindowDays,
+          business.timezone ?? DEFAULT_CALENDAR_TIMEZONE,
+        ),
       },
     );
 
@@ -230,7 +234,10 @@ export async function getAvailableSlotsForCustomerAction(
       },
       {
         minHoursBefore: minHours,
-        maxBookingDate: maxBookingDateString(bookingWindowDays),
+        maxBookingDate: maxBookingDateString(
+          bookingWindowDays,
+          business.timezone ?? DEFAULT_CALENDAR_TIMEZONE,
+        ),
       },
     );
 
@@ -304,7 +311,13 @@ export async function bookCustomerAppointment(input: unknown): Promise<BookingRe
     if (Number.isNaN(startsAt.getTime())) return { ok: false, error: "invalid_time" };
 
     const dateStr = parsed.data.startsAt.slice(0, 10);
-    if (dateStr > maxBookingDateString(bookingWindowDays)) {
+    if (
+      dateStr >
+      maxBookingDateString(
+        bookingWindowDays,
+        business.timezone ?? DEFAULT_CALENDAR_TIMEZONE,
+      )
+    ) {
       return { ok: false, error: "outside_booking_window" };
     }
 

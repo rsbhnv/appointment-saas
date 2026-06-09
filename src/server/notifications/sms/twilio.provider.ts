@@ -42,6 +42,12 @@ export class TwilioSmsProvider implements SmsProvider {
       const payload = (await response.json()) as TwilioMessagesResponse;
 
       if (!response.ok) {
+        console.error("[sms] twilio_api_error", {
+          httpStatus: response.status,
+          code: payload.code ?? null,
+          message: payload.message ?? null,
+          to: `${input.to.slice(0, 4)}***`,
+        });
         return {
           ok: false,
           provider: this.name,
@@ -50,12 +56,27 @@ export class TwilioSmsProvider implements SmsProvider {
       }
 
       if (!payload.sid) {
+        console.error("[sms] twilio_api_error", {
+          httpStatus: response.status,
+          message: "missing_message_sid",
+          to: `${input.to.slice(0, 4)}***`,
+        });
         return { ok: false, provider: this.name, error: "missing_message_sid" };
       }
+
+      console.info("[sms] twilio_accepted", {
+        messageId: payload.sid,
+        httpStatus: response.status,
+        to: `${input.to.slice(0, 4)}***`,
+      });
 
       return { ok: true, provider: this.name, messageId: payload.sid };
     } catch (err) {
       const message = err instanceof Error ? err.message : "unknown_error";
+      console.error("[sms] twilio_request_failed", {
+        error: message,
+        to: `${input.to.slice(0, 4)}***`,
+      });
       return { ok: false, provider: this.name, error: message };
     }
   }

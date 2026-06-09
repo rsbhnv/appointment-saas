@@ -1,8 +1,10 @@
 import "server-only";
 
+import { after } from "next/server";
+
 import { formatHebrewDate, formatHebrewTime } from "@/lib/calendar/utils";
 import { isDemoMode } from "@/lib/env/client";
-import { isTwilioConfigured } from "@/lib/env/server";
+import { isTwilioConfigured, isSupabaseAdminConfigured } from "@/lib/env/server";
 import { canSendSms, preferencesFromCustomer } from "@/lib/notifications/preferences";
 import { formatPhoneE164 } from "@/lib/notifications/phone-e164";
 import { customerMyAppointmentsUrl } from "@/lib/tenant/customer-portal-paths";
@@ -23,8 +25,22 @@ type SmsLogContext = {
   businessId: string;
 };
 
-function logSmsSkipped(reason: string, ctx: SmsLogContext): void {
-  console.info("[sms] skipped", { reason, ...ctx });
+function redactPhone(phone: string | null): string | null {
+  if (!phone) return null;
+  const trimmed = phone.trim();
+  if (trimmed.length <= 4) return "***";
+  return `${trimmed.slice(0, 4)}***${trimmed.slice(-2)}`;
+}
+
+function logSmsSkipped(reason: string, ctx: SmsLogContext, extra?: Record<string, unknown>): void {
+  console.info("[sms] skipped", { reason, ...ctx, ...extra });
+}
+
+function logSmsAttempt(
+  ctx: SmsLogContext,
+  details: Record<string, unknown>,
+): void {
+  console.info("[sms] attempt", { ...ctx, ...details });
 }
 
 function logSmsSuccess(ctx: SmsLogContext, messageId: string, provider: string): void {
@@ -43,13 +59,22 @@ async function deliverSms(
   smsConsent: boolean,
   body: string,
 ): Promise<DeliverResult> {
+  logSmsAttempt(ctx, {
+    twilioConfigured: isTwilioConfigured(),
+    smsConsent,
+    phone: redactPhone(phone),
+    bodyLength: body.length,
+  });
+
   if (isDemoMode) {
     logSmsSkipped("demo_mode", ctx);
     return "skipped";
   }
 
   if (!isTwilioConfigured()) {
-    logSmsSkipped("twilio_not_configured", ctx);
+    logSmsSkipped("twilio_not_configured", ctx, {
+      hint: "Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER in production env.",
+    });
     return "skipped";
   }
 
@@ -60,10 +85,11 @@ async function deliverSms(
 
   const e164 = phone ? formatPhoneE164(phone) : null;
   if (!e164) {
-    logSmsSkipped("invalid_phone", ctx);
+    logSmsSkipped("invalid_phone", ctx, { phone: redactPhone(phone) });
     return "skipped";
   }
 
+  console.info("[sms] sending", { ...ctx, to: redactPhone(e164), provider: "twilio" });
   const result = await sendSms({ to: e164, body });
   if (!result.ok) {
     logSmsFailure(ctx, result.error, result.provider);
@@ -74,20 +100,28 @@ async function deliverSms(
   return "sent";
 }
 
-/** Fire-and-forget booking confirmation SMS after appointment is saved. */
+/** Schedule booking confirmation SMS after the response is sent (Vercel-safe). */
 export function scheduleBookingConfirmationSms(appointmentId: string): void {
-  void sendBookingConfirmationSms(appointmentId).catch((err) => {
-    console.error("[sms] booking_confirmation_unhandled", {
-      appointmentId,
-      error: err instanceof Error ? err.message : "unknown",
-    });
+  console.info("[sms] booking_confirmation_scheduled", { appointmentId });
+  after(async () => {
+    try {
+      await sendBookingConfirmationSms(appointmentId);
+    } catch (err) {
+      console.error("[sms] booking_confirmation_unhandled", {
+        appointmentId,
+        error: err instanceof Error ? err.message : "unknown",
+      });
+    }
   });
 }
 
 export async function sendBookingConfirmationSms(appointmentId: string): Promise<void> {
   const context = await loadAppointmentSmsContext(appointmentId);
   if (!context) {
-    console.warn("[sms] booking_confirmation_context_missing", { appointmentId });
+    console.warn("[sms] booking_confirmation_context_missing", {
+      appointmentId,
+      supabaseAdminConfigured: isSupabaseAdminConfigured,
+    });
     return;
   }
 

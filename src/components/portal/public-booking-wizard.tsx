@@ -22,6 +22,7 @@ import {
   startOfMonth,
   toDateInputValue,
 } from "@/lib/calendar/utils";
+import { DEFAULT_CALENDAR_TIMEZONE, addDaysToDateInput, todayDateInTimezone } from "@/lib/calendar/timezone";
 import {
   portalBtnPrimary,
   portalBtnSecondary,
@@ -72,6 +73,7 @@ type PublicBookingWizardProps = {
   arrivalInstructions?: string | null;
   paymentMethods?: string | null;
   businessCurrency?: string;
+  businessTimezone?: string;
   logoUrl?: string | null;
   services: Service[];
   staff: StaffMember[];
@@ -130,6 +132,7 @@ export function PublicBookingWizard({
   arrivalInstructions,
   paymentMethods,
   businessCurrency = "ILS",
+  businessTimezone = DEFAULT_CALENDAR_TIMEZONE,
   logoUrl,
   services,
   staff,
@@ -161,11 +164,15 @@ export function PublicBookingWizard({
   const [loadingMonth, setLoadingMonth] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
-  const maxDate = useMemo(() => {
-    const end = new Date();
-    end.setDate(end.getDate() + settings.bookingWindowDays);
-    return toDateInputValue(end);
-  }, [settings.bookingWindowDays]);
+  const businessToday = useMemo(
+    () => todayDateInTimezone(businessTimezone),
+    [businessTimezone],
+  );
+
+  const maxDate = useMemo(
+    () => addDaysToDateInput(businessToday, settings.bookingWindowDays, businessTimezone),
+    [businessToday, settings.bookingWindowDays, businessTimezone],
+  );
 
   const monthKey = useMemo(
     () => `${anchorMonth.getFullYear()}-${String(anchorMonth.getMonth() + 1).padStart(2, "0")}`,
@@ -607,8 +614,9 @@ export function PublicBookingWizard({
             availableDates={availableDates}
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
-            minDate={toDateInputValue(new Date())}
+            minDate={businessToday}
             maxDate={maxDate}
+            todayKey={businessToday}
             loading={loadingMonth}
           />
 

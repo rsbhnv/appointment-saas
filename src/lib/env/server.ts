@@ -109,6 +109,12 @@ if (env.NODE_ENV === "development" && !shouldSkipValidation() && !isTwilioConfig
   );
 }
 
+if (env.NODE_ENV === "production" && !shouldSkipValidation() && !isTwilioConfigured()) {
+  console.warn(
+    "[env] Twilio SMS is not configured in production — booking confirmation SMS will be skipped until TWILIO_* env vars are set on Vercel.",
+  );
+}
+
 export function isCronAuthorized(authHeader: string | null): boolean {
   const secret = env.CRON_SECRET;
   if (!secret) return false;

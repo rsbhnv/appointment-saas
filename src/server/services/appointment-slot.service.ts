@@ -2,7 +2,9 @@ import "server-only";
 
 import { parseTimeToMinutes } from "@/lib/availability/ranges";
 import {
+  addDaysToDateInput,
   DEFAULT_CALENDAR_TIMEZONE,
+  todayDateInTimezone,
   wallClockMinutesFromIso,
   wallClockToUtcDate,
 } from "@/lib/calendar/timezone";
@@ -398,6 +400,62 @@ function dedupeCalendarSlots(
   });
 }
 
+function minBookableStartMs(minHoursBefore = 0): number {
+  return Date.now() + minHoursBefore * 3_600_000;
+}
+
+function calendarRowsToCustomerSlots(
+  rows: CalendarAvailableSlot[],
+  date: string,
+  serviceDurationMinutes: number,
+): AvailableSlot[] {
+  const seenStarts = new Set<string>();
+  return rows
+    .filter((slot) => slot.date === date)
+    .filter((slot) => {
+      const spanMinutes =
+        (new Date(slot.endsAt).getTime() - new Date(slot.startsAt).getTime()) /
+        60_000;
+      return spanMinutes >= serviceDurationMinutes;
+    })
+    .map((slot) => ({
+      startsAt: slot.startsAt,
+      endsAt: new Date(
+        new Date(slot.startsAt).getTime() + serviceDurationMinutes * 60_000,
+      ).toISOString(),
+    }))
+    .filter((slot) => {
+      if (seenStarts.has(slot.startsAt)) return false;
+      seenStarts.add(slot.startsAt);
+      return true;
+    });
+}
+
+function filterCustomerBookableSlots(
+  slots: AvailableSlot[],
+  minStartMs: number,
+): AvailableSlot[] {
+  return slots.filter(
+    (slot) => new Date(slot.startsAt).getTime() >= minStartMs,
+  );
+}
+
+function dateInputRange(from: string, to: string): string[] {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
+    return [];
+  }
+  const dates: string[] = [];
+  let cursor = from;
+  while (cursor <= to) {
+    dates.push(cursor);
+    if (cursor === to) break;
+    const [y, m, d] = cursor.split("-").map(Number);
+    const next = new Date(y!, m! - 1, d! + 1);
+    cursor = toDateInputValue(next);
+  }
+  return dates;
+}
+
 /**
  * Admin booking slots — aligned with the calendar grid, includes past times today.
  */
@@ -448,7 +506,7 @@ export async function getAvailableSlotsForAdmin(
     });
 }
 
-/** Customer booking — aligned with the admin calendar grid, respects booking constraints. */
+/** Customer booking — same grid as admin, filtered by min lead time and booking window. */
 export async function getAvailableSlotsForCustomer(
   query: AdminSlotsQuery,
   constraints: SlotBookingConstraints = {},
@@ -458,11 +516,32 @@ export async function getAvailableSlotsForCustomer(
     return [];
   }
 
-  const slots = await getAvailableSlotsForAdmin(query);
-  const minHours = constraints.minHoursBefore ?? 0;
-  const minStartMs = Date.now() + minHours * 3_600_000;
+  const service = await findServiceById(query.businessId, query.serviceId);
+  if (!service?.active) return [];
 
-  return slots.filter((slot) => new Date(slot.startsAt).getTime() >= minStartMs);
+  const staff = await findStaffById(query.businessId, query.staffMemberId);
+  if (!staff?.active) return [];
+
+  const calendarSlots = await listCalendarAvailableSlots(
+    {
+      businessId: query.businessId,
+      from: query.date,
+      to: query.date,
+      staffMemberId: query.staffMemberId,
+      excludeAppointmentId: query.excludeAppointmentId,
+    },
+    { includePast: true },
+  );
+
+  const minStartMs = minBookableStartMs(constraints.minHoursBefore);
+  return filterCustomerBookableSlots(
+    calendarRowsToCustomerSlots(
+      calendarSlots,
+      query.date,
+      service.duration_minutes,
+    ),
+    minStartMs,
+  );
 }
 
 /** Dates in range that have at least one bookable slot for the customer. */
@@ -483,31 +562,36 @@ export async function getCustomerBookingDatesWithSlots(
       to: query.to,
       staffMemberId: query.staffMemberId,
     },
-    { includePast: false },
+    { includePast: true },
   );
 
-  const minHours = constraints.minHoursBefore ?? 0;
-  const minStartMs = Date.now() + minHours * 3_600_000;
+  const minStartMs = minBookableStartMs(constraints.minHoursBefore);
   const maxDate = constraints.maxBookingDate;
-
   const dates = new Set<string>();
-  for (const slot of calendarSlots) {
-    if (maxDate && slot.date > maxDate) continue;
-    if (new Date(slot.startsAt).getTime() < minStartMs) continue;
-    const spanMinutes =
-      (new Date(slot.endsAt).getTime() - new Date(slot.startsAt).getTime()) / 60_000;
-    if (spanMinutes >= service.duration_minutes) {
-      dates.add(slot.date);
-    }
+
+  for (const date of dateInputRange(query.from, query.to)) {
+    if (maxDate && date > maxDate) continue;
+    const daySlots = filterCustomerBookableSlots(
+      calendarRowsToCustomerSlots(
+        calendarSlots,
+        date,
+        service.duration_minutes,
+      ),
+      minStartMs,
+    );
+    if (daySlots.length > 0) dates.add(date);
   }
+
   return [...dates].sort();
 }
 
-export function maxBookingDateString(bookingWindowDays: number): string {
-  const end = new Date();
-  end.setDate(end.getDate() + bookingWindowDays);
-  const y = end.getFullYear();
-  const m = String(end.getMonth() + 1).padStart(2, "0");
-  const d = String(end.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+export function maxBookingDateString(
+  bookingWindowDays: number,
+  timeZone = DEFAULT_CALENDAR_TIMEZONE,
+): string {
+  return addDaysToDateInput(
+    todayDateInTimezone(timeZone),
+    bookingWindowDays,
+    timeZone,
+  );
 }

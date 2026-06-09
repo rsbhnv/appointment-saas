@@ -1,5 +1,24 @@
 export const DEFAULT_CALENDAR_TIMEZONE = "Asia/Jerusalem";
 
+/** YYYY-MM-DD for "now" in the business timezone. */
+export function todayDateInTimezone(
+  timeZone = DEFAULT_CALENDAR_TIMEZONE,
+): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone }).format(new Date());
+}
+
+/** Add calendar days to a YYYY-MM-DD date in the given timezone. */
+export function addDaysToDateInput(
+  dateInput: string,
+  days: number,
+  timeZone = DEFAULT_CALENDAR_TIMEZONE,
+): string {
+  const anchor = wallClockToUtcDate(dateInput, 12 * 60, timeZone);
+  return new Intl.DateTimeFormat("en-CA", { timeZone }).format(
+    new Date(anchor.getTime() + days * 86_400_000),
+  );
+}
+
 const WEEKDAY_TO_ISO: Record<string, number> = {
   Mon: 1,
   Tue: 2,

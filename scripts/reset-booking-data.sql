@@ -10,134 +10,122 @@
 --   businesses, business_members, staff_members, services, app_settings,
 --   locations, cancellation_policies, subscriptions, auth users.
 --
--- HOW TO RUN:
---   1. Open Supabase Dashboard → SQL Editor (or psql as postgres).
---   2. Edit target_businesses below (one slug, or remove WHERE for ALL tenants).
---   3. Run the PREVIEW section first and verify row counts.
---   4. Uncomment BEGIN/COMMIT and run the DELETE section.
+-- HOW TO RUN (Supabase SQL Editor):
+--   1. Set v_target_slug below (or NULL for ALL businesses — dangerous).
+--   2. Run section A (PREVIEW) and verify counts.
+--   3. Run section B (DELETE) — irreversible.
 --
 -- Does NOT touch challenge_days (separate remote-only table).
 -- =============================================================================
 
--- ── 1. TARGET ────────────────────────────────────────────────────────────────
--- Option A: single business by slug
--- Option B: comment out the WHERE line to affect ALL businesses (dangerous)
+-- ── A. PREVIEW (safe) ────────────────────────────────────────────────────────
+-- Edit slug here only:
+--   'odelia-clinic'  = one business
+--   NULL             = all businesses
 
-with target_businesses as (
-  select id, slug, name
-  from public.businesses
-  where slug = 'odelia-clinic'  -- ← change slug, or remove this line for ALL
-)
+do $$
+declare
+  v_target_slug text := 'odelia-clinic';
+  v_business_ids uuid[];
+begin
+  select coalesce(array_agg(id), '{}')
+  into v_business_ids
+  from public.businesses b
+  where v_target_slug is null or b.slug = v_target_slug;
 
--- ── 2. PREVIEW (safe — run this first) ─────────────────────────────────────
-select 'businesses (target)' as table_name, count(*) as rows
-from target_businesses
-union all
-select 'appointments', count(*)
-from public.appointments a
-where a.business_id in (select id from target_businesses)
-union all
-select 'customers', count(*)
-from public.customers c
-where c.business_id in (select id from target_businesses)
-union all
-select 'availability_rules', count(*)
-from public.availability_rules r
-where r.business_id in (select id from target_businesses)
-union all
-select 'availability_exceptions', count(*)
-from public.availability_exceptions e
-where e.business_id in (select id from target_businesses)
-union all
-select 'slot_overrides', count(*)
-from public.slot_overrides s
-where s.business_id in (select id from target_businesses)
-union all
-select 'payments', count(*)
-from public.payments p
-where p.business_id in (select id from target_businesses)
-union all
-select 'notification_logs', count(*)
-from public.notification_logs n
-where n.business_id in (select id from target_businesses)
-union all
-select 'audit_logs (booking-related)', count(*)
-from public.audit_logs al
-where al.business_id in (select id from target_businesses)
-  and al.entity_type in (
-    'appointment',
-    'availability_rule',
-    'availability_exception',
-    'slot_override',
-    'customer'
-  )
-order by 1;
+  if array_length(v_business_ids, 1) is null then
+    raise exception 'No businesses matched slug %', v_target_slug;
+  end if;
+
+  raise notice 'Target business count: %', array_length(v_business_ids, 1);
+  raise notice 'appointments:              %',
+    (select count(*) from public.appointments where business_id = any(v_business_ids));
+  raise notice 'customers:                 %',
+    (select count(*) from public.customers where business_id = any(v_business_ids));
+  raise notice 'availability_rules:        %',
+    (select count(*) from public.availability_rules where business_id = any(v_business_ids));
+  raise notice 'availability_exceptions:   %',
+    (select count(*) from public.availability_exceptions where business_id = any(v_business_ids));
+  raise notice 'slot_overrides:            %',
+    (select count(*) from public.slot_overrides where business_id = any(v_business_ids));
+  raise notice 'payments:                  %',
+    (select count(*) from public.payments where business_id = any(v_business_ids));
+  raise notice 'notification_logs:         %',
+    (select count(*) from public.notification_logs where business_id = any(v_business_ids));
+  raise notice 'audit_logs (booking):      %',
+    (select count(*) from public.audit_logs
+     where business_id = any(v_business_ids)
+       and entity_type in (
+         'appointment', 'availability_rule', 'availability_exception',
+         'slot_override', 'customer'
+       ));
+end $$;
 
 
--- ── 3. DELETE (irreversible — uncomment transaction block to run) ────────────
+-- ── B. DELETE (irreversible — run only after preview) ────────────────────────
+-- Edit slug to match section A, then run this block alone.
+
+do $$
+declare
+  v_target_slug text := 'odelia-clinic';
+  v_business_ids uuid[];
+begin
+  select coalesce(array_agg(id), '{}')
+  into v_business_ids
+  from public.businesses b
+  where v_target_slug is null or b.slug = v_target_slug;
+
+  if array_length(v_business_ids, 1) is null then
+    raise exception 'No businesses matched slug %', v_target_slug;
+  end if;
+
+  delete from public.notification_logs
+  where business_id = any(v_business_ids);
+
+  delete from public.payments
+  where business_id = any(v_business_ids);
+
+  delete from public.appointments
+  where business_id = any(v_business_ids);
+
+  delete from public.slot_overrides
+  where business_id = any(v_business_ids);
+
+  delete from public.availability_exceptions
+  where business_id = any(v_business_ids);
+
+  delete from public.availability_rules
+  where business_id = any(v_business_ids);
+
+  delete from public.customers
+  where business_id = any(v_business_ids);
+
+  delete from public.audit_logs
+  where business_id = any(v_business_ids)
+    and entity_type in (
+      'appointment',
+      'availability_rule',
+      'availability_exception',
+      'slot_override',
+      'customer'
+    );
+
+  raise notice 'Delete complete for % business(es).', array_length(v_business_ids, 1);
+end $$;
+
+
+-- ── C. OPTIONAL: cross-scope duplicate availability (read-only) ──────────────
 /*
-begin;
-
-with target_businesses as (
-  select id
-  from public.businesses
-  where slug = 'odelia-clinic'  -- ← must match preview filter
-)
-
--- Child tables first (FK-safe order)
-delete from public.notification_logs n
-where n.business_id in (select id from target_businesses);
-
-delete from public.payments p
-where p.business_id in (select id from target_businesses);
-
-delete from public.appointments a
-where a.business_id in (select id from target_businesses);
-
-delete from public.slot_overrides s
-where s.business_id in (select id from target_businesses);
-
-delete from public.availability_exceptions e
-where e.business_id in (select id from target_businesses);
-
-delete from public.availability_rules r
-where r.business_id in (select id from target_businesses);
-
-delete from public.customers c
-where c.business_id in (select id from target_businesses);
-
-delete from public.audit_logs al
-where al.business_id in (select id from target_businesses)
-  and al.entity_type in (
-    'appointment',
-    'availability_rule',
-    'availability_exception',
-    'slot_override',
-    'customer'
+select g.business_id, g.day_of_week, g.start_time, g.end_time, s.staff_member_id
+from public.availability_rules g
+join public.availability_rules s
+  on s.business_id = g.business_id
+ and s.day_of_week = g.day_of_week
+ and s.start_time = g.start_time
+ and s.end_time = g.end_time
+ and s.staff_member_id is not null
+where g.staff_member_id is null
+  and g.business_id in (
+    select id from public.businesses where slug = 'odelia-clinic'
   );
-
-commit;
-*/
-
-
--- ── 4. OPTIONAL: find cross-scope duplicate availability (read-only) ─────────
-/*
-with target_businesses as (
-  select id from public.businesses where slug = 'odelia-clinic'
-),
-global_rules as (
-  select business_id, day_of_week, start_time, end_time
-  from public.availability_rules
-  where business_id in (select id from target_businesses)
-    and staff_member_id is null
-),
-staff_rules as (
-  select business_id, staff_member_id, day_of_week, start_time, end_time
-  from public.availability_rules
-  where business_id in (select id from target_businesses)
-    and staff_member_id is not null
-)
-select g.*, s.staff_member_id
-from global_rules g
-join staff_rules s using (business_id, day_of_week, start_time, end_time);
 */
