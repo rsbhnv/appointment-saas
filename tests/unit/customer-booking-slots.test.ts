@@ -17,6 +17,29 @@ describe("customer booking calendar dates", () => {
   });
 });
 
+describe("booking slot grid step", () => {
+  it("spaces slots by duration + break (60+15), not every 15 minutes", () => {
+    const slotDuration = 60;
+    const step = slotDuration + 15;
+    const starts: number[] = [];
+    for (let cursor = 9 * 60; cursor + slotDuration <= 20 * 60; cursor += step) {
+      starts.push(cursor);
+    }
+    expect(starts).toEqual([
+      9 * 60,
+      10 * 60 + 15,
+      11 * 60 + 30,
+      12 * 60 + 45,
+      14 * 60,
+      15 * 60 + 15,
+      16 * 60 + 30,
+      17 * 60 + 45,
+      19 * 60,
+    ]);
+    expect(starts).not.toContain(9 * 60 + 15);
+  });
+});
+
 describe("min_hours_before_booking hides rest of today", () => {
   it("excludes last slot when lead time exceeds remaining window", () => {
     const slotDuration = 60;

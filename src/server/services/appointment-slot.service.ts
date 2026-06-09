@@ -40,7 +40,14 @@ import {
 import { findSettingsByBusinessId } from "@/server/repositories/app-settings";
 import type { SlotOverride } from "@/server/repositories/availability";
 
-const SLOT_STEP_MINUTES = 15;
+function bookingSlotStepMinutes(settings: {
+  default_slot_duration_minutes: number;
+  break_between_appointments_minutes: number;
+} | null): number {
+  const duration = settings?.default_slot_duration_minutes ?? 60;
+  const breakMinutes = settings?.break_between_appointments_minutes ?? 15;
+  return duration + breakMinutes;
+}
 
 async function resolveWorkingWindows(
   businessId: string,
@@ -208,6 +215,8 @@ export async function getAvailableSlots(
 
   const business = await findBusinessById(query.businessId);
   const timeZone = business?.timezone ?? DEFAULT_CALENDAR_TIMEZONE;
+  const settings = await findSettingsByBusinessId(query.businessId);
+  const slotStepMinutes = bookingSlotStepMinutes(settings);
 
   const windows = await resolveWorkingWindows(
     query.businessId,
@@ -239,7 +248,7 @@ export async function getAvailableSlots(
     for (
       let cursor = window.startMinutes;
       cursor + service.duration_minutes <= window.endMinutes;
-      cursor += SLOT_STEP_MINUTES
+      cursor += slotStepMinutes
     ) {
       const startsAt = wallClockToUtcDate(query.date, cursor, timeZone);
       const endsAt = new Date(
