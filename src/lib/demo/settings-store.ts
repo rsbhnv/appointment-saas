@@ -39,6 +39,13 @@ export const demoSettingsStore = {
         min_hours_before_booking: patch.min_hours_before_booking ?? 2,
         max_appointments_per_customer_per_day:
           patch.max_appointments_per_customer_per_day ?? 1,
+        max_appointments_per_customer_per_week:
+          patch.max_appointments_per_customer_per_week ?? 1,
+        max_appointments_per_customer_per_month:
+          patch.max_appointments_per_customer_per_month ?? 1,
+        limit_one_booking_per_day: patch.limit_one_booking_per_day ?? true,
+        limit_one_booking_per_week: patch.limit_one_booking_per_week ?? false,
+        limit_one_booking_per_month: patch.limit_one_booking_per_month ?? false,
         allow_customer_cancellation: patch.allow_customer_cancellation ?? true,
         cancellation_min_hours: patch.cancellation_min_hours ?? 4,
         default_slot_duration_minutes: patch.default_slot_duration_minutes ?? 60,
@@ -53,6 +60,13 @@ export const demoSettingsStore = {
         min_hours_before_booking: input.min_hours_before_booking ?? 2,
         max_appointments_per_customer_per_day:
           input.max_appointments_per_customer_per_day ?? 1,
+        max_appointments_per_customer_per_week:
+          input.max_appointments_per_customer_per_week ?? 1,
+        max_appointments_per_customer_per_month:
+          input.max_appointments_per_customer_per_month ?? 1,
+        limit_one_booking_per_day: input.limit_one_booking_per_day ?? true,
+        limit_one_booking_per_week: input.limit_one_booking_per_week ?? false,
+        limit_one_booking_per_month: input.limit_one_booking_per_month ?? false,
         allow_customer_cancellation: input.allow_customer_cancellation ?? true,
         cancellation_min_hours: input.cancellation_min_hours ?? 4,
         default_slot_duration_minutes: input.default_slot_duration_minutes ?? 60,

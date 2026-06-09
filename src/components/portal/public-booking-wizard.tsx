@@ -57,6 +57,8 @@ const ERROR_COPY: Record<string, string> = {
   outside_booking_window: "התאריך מחוץ לחלון ההזמנה.",
   too_soon: "יש להזמין מראש לפי מדיניות העסק.",
   daily_limit_reached: "הגעתם למכסת התורים ליום זה.",
+  weekly_limit_reached: "הגעתם למכסת התורים לשבוע זה.",
+  monthly_limit_reached: "הגעתם למכסת התורים לחודש זה.",
   booking_unavailable: "הזמנה אינה זמינה כרגע.",
   unknown: "לא הצלחנו לשמור את התור. נסו שוב.",
 };

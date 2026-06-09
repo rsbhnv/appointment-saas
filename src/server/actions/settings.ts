@@ -46,6 +46,11 @@ const BookingSettingsSchema = z.object({
   booking_window_days: z.coerce.number().int().min(1).max(365),
   min_hours_before_booking: z.coerce.number().int().min(0),
   max_appointments_per_customer_per_day: z.coerce.number().int().min(1),
+  max_appointments_per_customer_per_week: z.coerce.number().int().min(1),
+  max_appointments_per_customer_per_month: z.coerce.number().int().min(1),
+  limit_one_booking_per_day: z.coerce.boolean(),
+  limit_one_booking_per_week: z.coerce.boolean(),
+  limit_one_booking_per_month: z.coerce.boolean(),
   allow_customer_cancellation: z.coerce.boolean(),
   cancellation_min_hours: z.coerce.number().int().min(0),
   default_slot_duration_minutes: z.coerce.number().int().min(5).max(480),
@@ -155,6 +160,13 @@ export const updateBookingSettingsAction = withAudit(
         min_hours_before_booking: parsed.data.min_hours_before_booking,
         max_appointments_per_customer_per_day:
           parsed.data.max_appointments_per_customer_per_day,
+        max_appointments_per_customer_per_week:
+          parsed.data.max_appointments_per_customer_per_week,
+        max_appointments_per_customer_per_month:
+          parsed.data.max_appointments_per_customer_per_month,
+        limit_one_booking_per_day: parsed.data.limit_one_booking_per_day,
+        limit_one_booking_per_week: parsed.data.limit_one_booking_per_week,
+        limit_one_booking_per_month: parsed.data.limit_one_booking_per_month,
         allow_customer_cancellation: parsed.data.allow_customer_cancellation,
         cancellation_min_hours: parsed.data.cancellation_min_hours,
         default_slot_duration_minutes: parsed.data.default_slot_duration_minutes,

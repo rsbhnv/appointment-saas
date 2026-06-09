@@ -80,7 +80,7 @@ type CalendarGridProps = {
   anchorDate: Date;
   view: "day" | "week" | "month";
   onSelect: (id: string) => void;
-  selectedDateKeys?: string[];
+  selectedDateKey?: string | null;
   availableSlotsByDate?: Record<string, CalendarAvailableSlot[]>;
   onDateSelect?: (date: Date) => void;
 };
@@ -118,7 +118,7 @@ function WeekDayColumn({
   day,
   appointments,
   availableSlotsByDate,
-  focusedKey,
+  selectedDateKey,
   onSelect,
   onDateSelect,
   compact = false,
@@ -126,7 +126,7 @@ function WeekDayColumn({
   day: Date;
   appointments: CalendarAppointment[];
   availableSlotsByDate: Record<string, CalendarAvailableSlot[]>;
-  focusedKey: string;
+  selectedDateKey: string | null;
   onSelect: (id: string) => void;
   onDateSelect?: (date: Date) => void;
   compact?: boolean;
@@ -134,23 +134,35 @@ function WeekDayColumn({
   const dateKey = toDateInputValue(day);
   const dayItems = appointmentsForDay(appointments, day);
   const slotCount = availableSlotsByDate[dateKey]?.length ?? 0;
-  const isFocused = dateKey === focusedKey;
+  const isSelected = dateKey === selectedDateKey;
+  const clickable = Boolean(onDateSelect);
 
   return (
     <div
+      role={clickable ? "button" : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onClick={clickable ? () => onDateSelect?.(day) : undefined}
+      onKeyDown={
+        clickable
+          ? (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onDateSelect?.(day);
+              }
+            }
+          : undefined
+      }
       className={cn(
         "flex flex-col rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-2 text-start",
         compact ? "min-h-0" : "min-h-36",
-        isFocused && "border-primary ring-1 ring-primary/30",
+        isSelected && "border-primary ring-1 ring-primary/30",
+        clickable &&
+          "cursor-pointer transition hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
       )}
     >
-      <button
-        type="button"
-        onClick={() => onDateSelect?.(day)}
-        className="mb-2 w-full rounded-md py-1 text-start text-xs font-semibold text-on-surface transition hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:text-sm"
-      >
+      <div className="mb-2 w-full py-1 text-xs font-semibold text-on-surface sm:text-sm">
         {formatHebrewDate(day.toISOString())}
-      </button>
+      </div>
       <div className="mb-2 flex flex-wrap gap-1">
         {dayItems.length > 0 ? (
           <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary sm:text-xs">
@@ -196,7 +208,7 @@ export function CalendarGridViews({
   anchorDate,
   view,
   onSelect,
-  selectedDateKeys = [],
+  selectedDateKey = null,
   availableSlotsByDate = {},
   onDateSelect,
 }: CalendarGridProps) {
@@ -265,7 +277,6 @@ export function CalendarGridViews({
   if (view === "week") {
     const weekStart = startOfWeek(anchorDate);
     const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
-    const focusedKey = toDateInputValue(anchorDate);
 
     return (
       <div className="space-y-3">
@@ -276,7 +287,7 @@ export function CalendarGridViews({
               day={day}
               appointments={appointments}
               availableSlotsByDate={availableSlotsByDate}
-              focusedKey={focusedKey}
+              selectedDateKey={selectedDateKey}
               onSelect={onSelect}
               onDateSelect={onDateSelect}
               compact
@@ -291,7 +302,7 @@ export function CalendarGridViews({
                 day={day}
                 appointments={appointments}
                 availableSlotsByDate={availableSlotsByDate}
-                focusedKey={focusedKey}
+                selectedDateKey={selectedDateKey}
                 onSelect={onSelect}
                 onDateSelect={onDateSelect}
               />
@@ -306,8 +317,6 @@ export function CalendarGridViews({
   const gridStart = startOfWeek(monthStart);
   const cells = Array.from({ length: 42 }, (_, i) => addDays(gridStart, i));
   const today = startOfDay(new Date());
-  const selectedDateSet = new Set(selectedDateKeys);
-  const focusedKey = toDateInputValue(anchorDate);
 
   return (
     <div className="space-y-2">
@@ -324,34 +333,45 @@ export function CalendarGridViews({
           const inMonth = day.getMonth() === anchorDate.getMonth();
           const dateKey = toDateInputValue(day);
           const isPast = startOfDay(day) < today;
-          const isSelected = selectedDateSet.has(dateKey);
-          const isFocused = dateKey === focusedKey;
+          const isSelected = dateKey === selectedDateKey;
           const availableSlotCount = availableSlotsByDate[dateKey]?.length ?? 0;
+          const clickable = Boolean(onDateSelect);
           return (
             <div
               key={dateKey}
+              role={clickable ? "button" : undefined}
+              tabIndex={clickable ? 0 : undefined}
+              onClick={clickable ? () => onDateSelect?.(day) : undefined}
+              onKeyDown={
+                clickable
+                  ? (event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onDateSelect?.(day);
+                      }
+                    }
+                  : undefined
+              }
               className={cn(
                 "min-h-[5.5rem] rounded-lg border border-outline-variant/20 p-0.5 sm:min-h-28 sm:p-2",
                 inMonth ? "bg-surface-container-lowest" : "bg-surface-container-low/40 opacity-60",
-                (isSelected || isFocused) &&
+                isSelected &&
                   "border-primary bg-primary/10 opacity-100 ring-1 ring-primary/30",
-                isPast && "text-on-surface-variant",
+                isPast && !isSelected && "text-on-surface-variant",
+                clickable &&
+                  "cursor-pointer transition hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
               )}
+              aria-pressed={isSelected}
             >
               <div className="flex items-start justify-between gap-1">
-                <button
-                  type="button"
-                  disabled={!onDateSelect}
-                  onClick={() => onDateSelect?.(day)}
+                <span
                   className={cn(
-                    "rounded-full px-2 py-0.5 text-xs font-medium text-on-surface transition",
-                    onDateSelect && "hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                    "rounded-full px-2 py-0.5 text-xs font-medium text-on-surface",
                     isPast && "opacity-80",
                   )}
-                  aria-pressed={isSelected || isFocused}
                 >
                   {day.getDate()}
-                </button>
+                </span>
               </div>
               <div className="mt-1 flex flex-wrap gap-1">
                 {dayItems.length > 0 ? (

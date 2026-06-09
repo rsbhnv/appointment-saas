@@ -329,6 +329,11 @@ export interface Database {
           booking_window_days: number;
           min_hours_before_booking: number;
           max_appointments_per_customer_per_day: number;
+          max_appointments_per_customer_per_week: number;
+          max_appointments_per_customer_per_month: number;
+          limit_one_booking_per_day: boolean;
+          limit_one_booking_per_week: boolean;
+          limit_one_booking_per_month: boolean;
           allow_customer_cancellation: boolean;
           cancellation_min_hours: number;
           default_slot_duration_minutes: number;
@@ -341,6 +346,11 @@ export interface Database {
           booking_window_days?: number;
           min_hours_before_booking?: number;
           max_appointments_per_customer_per_day?: number;
+          max_appointments_per_customer_per_week?: number;
+          max_appointments_per_customer_per_month?: number;
+          limit_one_booking_per_day?: boolean;
+          limit_one_booking_per_week?: boolean;
+          limit_one_booking_per_month?: boolean;
           allow_customer_cancellation?: boolean;
           cancellation_min_hours?: number;
           default_slot_duration_minutes?: number;

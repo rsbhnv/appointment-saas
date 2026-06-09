@@ -48,8 +48,17 @@ export function SettingsForms({ business, settings, canEdit }: SettingsFormsProp
   const [booking, setBooking] = useState({
     booking_window_days: String(settings?.booking_window_days ?? 30),
     min_hours_before_booking: String(settings?.min_hours_before_booking ?? 2),
+    limit_one_booking_per_day: settings?.limit_one_booking_per_day ?? true,
     max_appointments_per_customer_per_day: String(
       settings?.max_appointments_per_customer_per_day ?? 1,
+    ),
+    limit_one_booking_per_week: settings?.limit_one_booking_per_week ?? false,
+    max_appointments_per_customer_per_week: String(
+      settings?.max_appointments_per_customer_per_week ?? 1,
+    ),
+    limit_one_booking_per_month: settings?.limit_one_booking_per_month ?? false,
+    max_appointments_per_customer_per_month: String(
+      settings?.max_appointments_per_customer_per_month ?? 1,
     ),
     allow_customer_cancellation: settings?.allow_customer_cancellation ?? true,
     cancellation_min_hours: String(settings?.cancellation_min_hours ?? 4),
@@ -91,6 +100,15 @@ export function SettingsForms({ business, settings, canEdit }: SettingsFormsProp
         max_appointments_per_customer_per_day: Number(
           booking.max_appointments_per_customer_per_day,
         ),
+        max_appointments_per_customer_per_week: Number(
+          booking.max_appointments_per_customer_per_week,
+        ),
+        max_appointments_per_customer_per_month: Number(
+          booking.max_appointments_per_customer_per_month,
+        ),
+        limit_one_booking_per_day: booking.limit_one_booking_per_day,
+        limit_one_booking_per_week: booking.limit_one_booking_per_week,
+        limit_one_booking_per_month: booking.limit_one_booking_per_month,
         allow_customer_cancellation: booking.allow_customer_cancellation,
         cancellation_min_hours: Number(booking.cancellation_min_hours),
         default_slot_duration_minutes: Number(booking.default_slot_duration_minutes),
@@ -271,20 +289,106 @@ export function SettingsForms({ business, settings, canEdit }: SettingsFormsProp
               }
             />
           </Field>
-          <Field label="מקסימום תורים ללקוח ביום" htmlFor="max-per-day">
-            <Input
-              id="max-per-day"
-              type="number"
-              min={1}
-              value={booking.max_appointments_per_customer_per_day}
-              disabled={!canEdit}
-              onChange={(e) =>
-                setBooking((b) => ({
-                  ...b,
-                  max_appointments_per_customer_per_day: e.target.value,
-                }))
-              }
-            />
+          <Field label="מגבלות תורים ללקוח" className="md:col-span-2">
+            <div className="space-y-3 text-sm text-on-surface-variant">
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex min-w-[10rem] items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={booking.limit_one_booking_per_day}
+                    disabled={!canEdit}
+                    onChange={(e) =>
+                      setBooking((b) => ({
+                        ...b,
+                        limit_one_booking_per_day: e.target.checked,
+                      }))
+                    }
+                  />
+                  הגבלה ביום
+                </label>
+                <Input
+                  type="number"
+                  min={1}
+                  className="w-24"
+                  value={booking.max_appointments_per_customer_per_day}
+                  disabled={!canEdit || !booking.limit_one_booking_per_day}
+                  onChange={(e) =>
+                    setBooking((b) => ({
+                      ...b,
+                      max_appointments_per_customer_per_day: e.target.value,
+                    }))
+                  }
+                  aria-label="מקסימום תורים ביום"
+                />
+                <span>תורים ביום</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex min-w-[10rem] items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={booking.limit_one_booking_per_week}
+                    disabled={!canEdit}
+                    onChange={(e) =>
+                      setBooking((b) => ({
+                        ...b,
+                        limit_one_booking_per_week: e.target.checked,
+                      }))
+                    }
+                  />
+                  הגבלה בשבוע
+                </label>
+                <Input
+                  type="number"
+                  min={1}
+                  className="w-24"
+                  value={booking.max_appointments_per_customer_per_week}
+                  disabled={!canEdit || !booking.limit_one_booking_per_week}
+                  onChange={(e) =>
+                    setBooking((b) => ({
+                      ...b,
+                      max_appointments_per_customer_per_week: e.target.value,
+                    }))
+                  }
+                  aria-label="מקסימום תורים בשבוע"
+                />
+                <span>תורים בשבוע</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex min-w-[10rem] items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={booking.limit_one_booking_per_month}
+                    disabled={!canEdit}
+                    onChange={(e) =>
+                      setBooking((b) => ({
+                        ...b,
+                        limit_one_booking_per_month: e.target.checked,
+                      }))
+                    }
+                  />
+                  הגבלה בחודש
+                </label>
+                <Input
+                  type="number"
+                  min={1}
+                  className="w-24"
+                  value={booking.max_appointments_per_customer_per_month}
+                  disabled={!canEdit || !booking.limit_one_booking_per_month}
+                  onChange={(e) =>
+                    setBooking((b) => ({
+                      ...b,
+                      max_appointments_per_customer_per_month: e.target.value,
+                    }))
+                  }
+                  aria-label="מקסימום תורים בחודש"
+                />
+                <span>תורים בחודש</span>
+              </div>
+              <p className="text-xs">
+                סימון תיבה מפעיל את המגבלה; השדה המספרי קובע כמה תורים פעילים מותרים
+                לאותו לקוח בתקופה. ללא סימון — אין מגבלה לתקופה זו.
+              </p>
+            </div>
           </Field>
           <Field label="שעות מינימום לביטול" htmlFor="cancel-hours">
             <Input

@@ -46,6 +46,63 @@ export function getIsoDayOfWeekForDateInput(
   return iso;
 }
 
+const WEEKDAY_SHORT_TO_INDEX: Record<string, number> = {
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+};
+
+/** 0=Sunday … 6=Saturday for a YYYY-MM-DD date in the given timezone. */
+export function calendarWeekdayIndexForDateInput(
+  dateInput: string,
+  timeZone = DEFAULT_CALENDAR_TIMEZONE,
+): number {
+  const ref = new Date(`${dateInput}T12:00:00`);
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    weekday: "short",
+  }).format(ref);
+  return WEEKDAY_SHORT_TO_INDEX[weekday] ?? 0;
+}
+
+/** Sunday-start week containing dateInput (YYYY-MM-DD). */
+export function startOfWeekDateInput(
+  dateInput: string,
+  timeZone = DEFAULT_CALENDAR_TIMEZONE,
+): string {
+  const index = calendarWeekdayIndexForDateInput(dateInput, timeZone);
+  return addDaysToDateInput(dateInput, -index, timeZone);
+}
+
+export function startOfMonthDateInput(dateInput: string): string {
+  return `${dateInput.slice(0, 7)}-01`;
+}
+
+export function startOfNextMonthDateInput(dateInput: string): string {
+  const year = Number(dateInput.slice(0, 4));
+  const month = Number(dateInput.slice(5, 7));
+  if (month === 12) {
+    return `${year + 1}-01-01`;
+  }
+  return `${year}-${String(month + 1).padStart(2, "0")}-01`;
+}
+
+/** UTC bounds [gte, lt) for a half-open calendar-date range in timeZone. */
+export function utcBoundsForDateInputRange(
+  startDateInput: string,
+  endDateInputExclusive: string,
+  timeZone = DEFAULT_CALENDAR_TIMEZONE,
+): { gte: string; lt: string } {
+  return {
+    gte: wallClockToUtcDate(startDateInput, 0, timeZone).toISOString(),
+    lt: wallClockToUtcDate(endDateInputExclusive, 0, timeZone).toISOString(),
+  };
+}
+
 /** Wall-clock minutes from midnight on dateInput → UTC instant in timeZone. */
 export function wallClockToUtcDate(
   dateInput: string,

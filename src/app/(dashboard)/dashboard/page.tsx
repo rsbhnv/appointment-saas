@@ -38,9 +38,13 @@ export default async function DashboardOverviewPage({
     ? await findBusinessById(membership.businessId)
     : null;
 
-  const stats = membership
-    ? await getDashboardStats(membership.businessId)
-    : null;
+  const stats =
+    membership && business
+      ? await getDashboardStats(
+          membership.businessId,
+          business.timezone ?? "Asia/Jerusalem",
+        )
+      : null;
 
   const kpis = stats
     ? [

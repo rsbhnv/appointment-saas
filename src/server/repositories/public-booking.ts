@@ -186,6 +186,20 @@ export async function countPublicBookingAppointmentsOnDay(
   dayStartIso: string,
   dayEndIso: string,
 ): Promise<number> {
+  return countPublicBookingAppointmentsInRange(
+    businessId,
+    customerId,
+    dayStartIso,
+    dayEndIso,
+  );
+}
+
+export async function countPublicBookingAppointmentsInRange(
+  businessId: string,
+  customerId: string,
+  rangeStartIso: string,
+  rangeEndExclusiveIso: string,
+): Promise<number> {
   if (isDemoMode) return 0;
 
   const supabase = requireAdminClient();
@@ -195,11 +209,11 @@ export async function countPublicBookingAppointmentsOnDay(
     .eq("business_id", businessId)
     .eq("customer_id", customerId)
     .in("status", ["pending", "confirmed"])
-    .gte("starts_at", dayStartIso)
-    .lt("starts_at", dayEndIso);
+    .gte("starts_at", rangeStartIso)
+    .lt("starts_at", rangeEndExclusiveIso);
 
   if (error) {
-    throw new Error(`appointments day count failed: ${error.message}`);
+    throw new Error(`appointments range count failed: ${error.message}`);
   }
   return count ?? 0;
 }

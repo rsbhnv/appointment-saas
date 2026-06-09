@@ -61,10 +61,6 @@ type CalendarManagerProps = {
   canManage: boolean;
 };
 
-function sortDateKeys(keys: string[]): string[] {
-  return [...keys].sort((a, b) => a.localeCompare(b));
-}
-
 export function CalendarManager({
   initialAppointments,
   initialAvailableSlots,
@@ -83,10 +79,7 @@ export function CalendarManager({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
-  const [selectedDateKeys, setSelectedDateKeys] = useState<string[]>([]);
-  const [focusedDateKey, setFocusedDateKey] = useState(() =>
-    toDateInputValue(new Date()),
-  );
+  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const { from: rangeFrom, to: rangeTo } = useMemo(
@@ -123,25 +116,26 @@ export function CalendarManager({
     }, {});
   }, [visibleSlots]);
 
-  const focusedSlots = availableSlotsByDate[focusedDateKey] ?? [];
+  const focusedSlots = selectedDateKey
+    ? (availableSlotsByDate[selectedDateKey] ?? [])
+    : [];
   const hasVisibleContent =
     visibleAppointments.length > 0 || visibleSlots.length > 0;
 
-  const selectedCreateDate = selectedDateKeys.at(-1) ?? focusedDateKey;
+  const selectedCreateDate = selectedDateKey ?? toDateInputValue(new Date());
 
   function focusDay(date: Date) {
     const key = toDateInputValue(date);
+    if (selectedDateKey === key) {
+      setSelectedDateKey(null);
+      return;
+    }
     setAnchorDate(startOfDay(date));
-    setFocusedDateKey(key);
-    setSelectedDateKeys((current) =>
-      current.includes(key) ? current : sortDateKeys([...current, key]),
-    );
+    setSelectedDateKey(key);
   }
 
   function handleAnchorChange(date: Date) {
-    const normalized = startOfDay(date);
-    setAnchorDate(normalized);
-    setFocusedDateKey(toDateInputValue(normalized));
+    setAnchorDate(startOfDay(date));
   }
 
   function refreshCalendarData() {
@@ -217,22 +211,23 @@ export function CalendarManager({
   );
 
   const focusedAppointments = useMemo(() => {
+    if (!selectedDateKey) return [];
     return filteredAppointments
       .filter(
         (appointment) =>
-          toDateInputValue(new Date(appointment.startsAt)) === focusedDateKey,
+          toDateInputValue(new Date(appointment.startsAt)) === selectedDateKey,
       )
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
-  }, [filteredAppointments, focusedDateKey]);
+  }, [filteredAppointments, selectedDateKey]);
 
   const dayDetailPanel =
-    view === "day" || view === "month" || view === "week" ? (
+    selectedDateKey && (view === "day" || view === "month" || view === "week") ? (
       <div className="space-y-4">
         {view !== "day" && focusedAppointments.length > 0 ? (
           <div className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 text-sm">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <h2 className="font-semibold text-on-surface">
-                תורים — {formatHebrewDate(`${focusedDateKey}T12:00:00`)}
+                תורים — {formatHebrewDate(`${selectedDateKey}T12:00:00`)}
               </h2>
               <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
                 {focusedAppointments.length} תורים
@@ -267,7 +262,7 @@ export function CalendarManager({
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <h2 className="font-semibold text-on-surface">
                 {view === "day" ? "יום נבחר" : "סלוטים פנויים"} —{" "}
-                {formatHebrewDate(`${focusedDateKey}T12:00:00`)}
+                {formatHebrewDate(`${selectedDateKey}T12:00:00`)}
               </h2>
               <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
                 {formatCompactCount(focusedSlots.length)} פנויים
@@ -350,7 +345,7 @@ export function CalendarManager({
           anchorDate={anchorDate}
           view={view}
           onSelect={openDetail}
-          selectedDateKeys={selectedDateKeys}
+          selectedDateKey={selectedDateKey}
           availableSlotsByDate={availableSlotsByDate}
           onDateSelect={focusDay}
         />

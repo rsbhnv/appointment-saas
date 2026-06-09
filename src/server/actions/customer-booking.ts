@@ -5,12 +5,19 @@ import { z } from "zod";
 
 import { extractFirstName } from "@/lib/customer/name";
 import { isValidPhone } from "@/lib/customer/phone";
-import { DEFAULT_CALENDAR_TIMEZONE } from "@/lib/calendar/timezone";
+import {
+  addDaysToDateInput,
+  DEFAULT_CALENDAR_TIMEZONE,
+  startOfMonthDateInput,
+  startOfNextMonthDateInput,
+  startOfWeekDateInput,
+  utcBoundsForDateInputRange,
+} from "@/lib/calendar/timezone";
 import { customerBookingPath, customerMyAppointmentsPath } from "@/lib/tenant/customer-portal-paths";
 import { findSettingsByBusinessId } from "@/server/repositories/app-settings";
 import {
   cancelPublicBookingAppointment,
-  countPublicBookingAppointmentsOnDay,
+  countPublicBookingAppointmentsInRange,
   createPublicBookingAppointment,
   findCustomerByPhoneAndBusinessId,
   upsertCustomerForPublicBooking,
@@ -100,12 +107,45 @@ async function resolveActiveBusiness(slug: string) {
   return business;
 }
 
-function dayBoundsForStartsAt(startsAt: Date): { dayStart: string; dayEnd: string } {
-  const dayStart = new Date(startsAt);
-  dayStart.setHours(0, 0, 0, 0);
-  const dayEnd = new Date(startsAt);
-  dayEnd.setHours(23, 59, 59, 999);
-  return { dayStart: dayStart.toISOString(), dayEnd: dayEnd.toISOString() };
+function dayBoundsForStartsAt(
+  startsAt: Date,
+  timeZone: string,
+): { dayStart: string; dayEnd: string } {
+  const dateInput = new Intl.DateTimeFormat("en-CA", { timeZone }).format(startsAt);
+  const bounds = utcBoundsForDateInputRange(
+    dateInput,
+    addDaysToDateInput(dateInput, 1, timeZone),
+    timeZone,
+  );
+  return { dayStart: bounds.gte, dayEnd: bounds.lt };
+}
+
+function weekBoundsForStartsAt(
+  startsAt: Date,
+  timeZone: string,
+): { weekStart: string; weekEnd: string } {
+  const dateInput = new Intl.DateTimeFormat("en-CA", { timeZone }).format(startsAt);
+  const weekStartDate = startOfWeekDateInput(dateInput, timeZone);
+  const bounds = utcBoundsForDateInputRange(
+    weekStartDate,
+    addDaysToDateInput(weekStartDate, 7, timeZone),
+    timeZone,
+  );
+  return { weekStart: bounds.gte, weekEnd: bounds.lt };
+}
+
+function monthBoundsForStartsAt(
+  startsAt: Date,
+  timeZone: string,
+): { monthStart: string; monthEnd: string } {
+  const dateInput = new Intl.DateTimeFormat("en-CA", { timeZone }).format(startsAt);
+  const monthStartDate = startOfMonthDateInput(dateInput);
+  const bounds = utcBoundsForDateInputRange(
+    monthStartDate,
+    startOfNextMonthDateInput(dateInput),
+    timeZone,
+  );
+  return { monthStart: bounds.gte, monthEnd: bounds.lt };
 }
 
 export type IdentifiedCustomer = {
@@ -305,7 +345,13 @@ export async function bookCustomerAppointment(input: unknown): Promise<BookingRe
     const settings = await findSettingsByBusinessId(business.id);
     const bookingWindowDays = settings?.booking_window_days ?? 30;
     const minHours = settings?.min_hours_before_booking ?? 0;
+    const timeZone = business.timezone ?? DEFAULT_CALENDAR_TIMEZONE;
+    const limitPerDayEnabled = settings?.limit_one_booking_per_day ?? true;
+    const limitPerWeekEnabled = settings?.limit_one_booking_per_week ?? false;
+    const limitPerMonthEnabled = settings?.limit_one_booking_per_month ?? false;
     const maxPerDay = settings?.max_appointments_per_customer_per_day ?? 1;
+    const maxPerWeek = settings?.max_appointments_per_customer_per_week ?? 1;
+    const maxPerMonth = settings?.max_appointments_per_customer_per_month ?? 1;
 
     const startsAt = new Date(parsed.data.startsAt);
     if (Number.isNaN(startsAt.getTime())) return { ok: false, error: "invalid_time" };
@@ -344,15 +390,44 @@ export async function bookCustomerAppointment(input: unknown): Promise<BookingRe
       emailConsent: parsed.data.emailConsent,
     });
 
-    const { dayStart, dayEnd } = dayBoundsForStartsAt(startsAt);
-    const dayCount = await countPublicBookingAppointmentsOnDay(
-      business.id,
-      customer.id,
-      dayStart,
-      dayEnd,
-    );
-    if (dayCount >= maxPerDay) {
-      return { ok: false, error: "daily_limit_reached" };
+    const { dayStart, dayEnd } = dayBoundsForStartsAt(startsAt, timeZone);
+
+    if (limitPerDayEnabled) {
+      const dayCount = await countPublicBookingAppointmentsInRange(
+        business.id,
+        customer.id,
+        dayStart,
+        dayEnd,
+      );
+      if (dayCount >= maxPerDay) {
+        return { ok: false, error: "daily_limit_reached" };
+      }
+    }
+
+    if (limitPerWeekEnabled) {
+      const { weekStart, weekEnd } = weekBoundsForStartsAt(startsAt, timeZone);
+      const weekCount = await countPublicBookingAppointmentsInRange(
+        business.id,
+        customer.id,
+        weekStart,
+        weekEnd,
+      );
+      if (weekCount >= maxPerWeek) {
+        return { ok: false, error: "weekly_limit_reached" };
+      }
+    }
+
+    if (limitPerMonthEnabled) {
+      const { monthStart, monthEnd } = monthBoundsForStartsAt(startsAt, timeZone);
+      const monthCount = await countPublicBookingAppointmentsInRange(
+        business.id,
+        customer.id,
+        monthStart,
+        monthEnd,
+      );
+      if (monthCount >= maxPerMonth) {
+        return { ok: false, error: "monthly_limit_reached" };
+      }
     }
 
     const appointment = await createPublicBookingAppointment({

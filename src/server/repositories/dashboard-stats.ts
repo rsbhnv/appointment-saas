@@ -1,7 +1,15 @@
 import "server-only";
 
+import {
+  addDaysToDateInput,
+  DEFAULT_CALENDAR_TIMEZONE,
+  startOfWeekDateInput,
+  todayDateInTimezone,
+  utcBoundsForDateInputRange,
+} from "@/lib/calendar/timezone";
 import { isDemoMode } from "@/lib/env/client";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { AppointmentStatus } from "@/types/database";
 
 export type DashboardStats = {
   appointmentsToday: number;
@@ -10,22 +18,21 @@ export type DashboardStats = {
   activeStaffCount: number;
 };
 
-function startOfUtcDay(date: Date): Date {
-  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-}
-
-function startOfUtcWeek(date: Date): Date {
-  const day = startOfUtcDay(date);
-  const weekday = day.getUTCDay();
-  const diff = weekday === 0 ? 6 : weekday - 1;
-  day.setUTCDate(day.getUTCDate() - diff);
-  return day;
-}
+const ACTIVE_APPOINTMENT_STATUSES: AppointmentStatus[] = [
+  "pending",
+  "confirmed",
+  "completed",
+];
 
 async function countRows(
   table: "appointments" | "customers" | "staff_members",
   businessId: string,
-  filters?: { gte?: { column: string; value: string }; lt?: { column: string; value: string }; eq?: { column: string; value: boolean } },
+  filters?: {
+    gte?: { column: string; value: string };
+    lt?: { column: string; value: string };
+    eq?: { column: string; value: boolean };
+    statusIn?: AppointmentStatus[];
+  },
 ): Promise<number> {
   const supabase = await createSupabaseServerClient();
   let query = supabase
@@ -42,6 +49,9 @@ async function countRows(
   if (filters?.eq) {
     query = query.eq(filters.eq.column, filters.eq.value);
   }
+  if (filters?.statusIn) {
+    query = query.in("status", filters.statusIn);
+  }
 
   const { count, error } = await query;
   if (error) throw new Error(`${table} count failed: ${error.message}`);
@@ -50,6 +60,7 @@ async function countRows(
 
 export async function getDashboardStats(
   businessId: string,
+  timeZone = DEFAULT_CALENDAR_TIMEZONE,
 ): Promise<DashboardStats> {
   if (isDemoMode) {
     const { demoStaffStore } = await import("@/lib/demo/staff-store");
@@ -64,13 +75,13 @@ export async function getDashboardStats(
     };
   }
 
-  const now = new Date();
-  const todayStart = startOfUtcDay(now).toISOString();
-  const tomorrowStart = new Date(startOfUtcDay(now));
-  tomorrowStart.setUTCDate(tomorrowStart.getUTCDate() + 1);
-  const weekStart = startOfUtcWeek(now).toISOString();
-  const nextWeekStart = new Date(startOfUtcWeek(now));
-  nextWeekStart.setUTCDate(nextWeekStart.getUTCDate() + 7);
+  const today = todayDateInTimezone(timeZone);
+  const tomorrow = addDaysToDateInput(today, 1, timeZone);
+  const weekStart = startOfWeekDateInput(today, timeZone);
+  const nextWeekStart = addDaysToDateInput(weekStart, 7, timeZone);
+
+  const todayBounds = utcBoundsForDateInputRange(today, tomorrow, timeZone);
+  const weekBounds = utcBoundsForDateInputRange(weekStart, nextWeekStart, timeZone);
 
   const [
     appointmentsToday,
@@ -79,12 +90,14 @@ export async function getDashboardStats(
     activeStaffCount,
   ] = await Promise.all([
     countRows("appointments", businessId, {
-      gte: { column: "starts_at", value: todayStart },
-      lt: { column: "starts_at", value: tomorrowStart.toISOString() },
+      gte: { column: "starts_at", value: todayBounds.gte },
+      lt: { column: "starts_at", value: todayBounds.lt },
+      statusIn: ACTIVE_APPOINTMENT_STATUSES,
     }),
     countRows("appointments", businessId, {
-      gte: { column: "starts_at", value: weekStart },
-      lt: { column: "starts_at", value: nextWeekStart.toISOString() },
+      gte: { column: "starts_at", value: weekBounds.gte },
+      lt: { column: "starts_at", value: weekBounds.lt },
+      statusIn: ACTIVE_APPOINTMENT_STATUSES,
     }),
     countRows("customers", businessId),
     countRows("staff_members", businessId, {

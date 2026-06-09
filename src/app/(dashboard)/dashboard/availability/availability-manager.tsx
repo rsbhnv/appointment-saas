@@ -189,6 +189,13 @@ export function AvailabilityManager({
         min_hours_before_booking: settings?.min_hours_before_booking ?? 2,
         max_appointments_per_customer_per_day:
           settings?.max_appointments_per_customer_per_day ?? 1,
+        max_appointments_per_customer_per_week:
+          settings?.max_appointments_per_customer_per_week ?? 1,
+        max_appointments_per_customer_per_month:
+          settings?.max_appointments_per_customer_per_month ?? 1,
+        limit_one_booking_per_day: settings?.limit_one_booking_per_day ?? true,
+        limit_one_booking_per_week: settings?.limit_one_booking_per_week ?? false,
+        limit_one_booking_per_month: settings?.limit_one_booking_per_month ?? false,
         allow_customer_cancellation: settings?.allow_customer_cancellation ?? true,
         cancellation_min_hours: settings?.cancellation_min_hours ?? 4,
         confirmation_message: settings?.confirmation_message ?? null,
