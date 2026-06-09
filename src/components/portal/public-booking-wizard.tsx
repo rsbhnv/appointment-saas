@@ -626,6 +626,16 @@ export function PublicBookingWizard({
             </p>
           ) : null}
 
+          {!loadingMonth &&
+          !scheduleError &&
+          availableDates.size > 0 &&
+          !availableDates.has(businessToday) ? (
+            <p className="text-center text-sm text-on-surface-variant">
+              אין תורים פנויים להיום — נדרש להזמין לפחות{" "}
+              {settings.minHoursBeforeBooking} שעות מראש.
+            </p>
+          ) : null}
+
           {scheduleError ? (
             <p className="text-sm text-destructive" role="alert">
               {scheduleError}

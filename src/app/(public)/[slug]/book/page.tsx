@@ -32,6 +32,7 @@ export default async function CustomerBookingPage({
 
   const bookingSettings: CustomerBookingSettings = {
     bookingWindowDays: appSettings?.booking_window_days ?? 30,
+    minHoursBeforeBooking: appSettings?.min_hours_before_booking ?? 2,
     allowCustomerCancellation: appSettings?.allow_customer_cancellation ?? true,
     cancellationMinHours: appSettings?.cancellation_min_hours ?? 0,
   };

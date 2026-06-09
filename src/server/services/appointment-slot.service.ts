@@ -400,46 +400,6 @@ function dedupeCalendarSlots(
   });
 }
 
-function minBookableStartMs(minHoursBefore = 0): number {
-  return Date.now() + minHoursBefore * 3_600_000;
-}
-
-function calendarRowsToCustomerSlots(
-  rows: CalendarAvailableSlot[],
-  date: string,
-  serviceDurationMinutes: number,
-): AvailableSlot[] {
-  const seenStarts = new Set<string>();
-  return rows
-    .filter((slot) => slot.date === date)
-    .filter((slot) => {
-      const spanMinutes =
-        (new Date(slot.endsAt).getTime() - new Date(slot.startsAt).getTime()) /
-        60_000;
-      return spanMinutes >= serviceDurationMinutes;
-    })
-    .map((slot) => ({
-      startsAt: slot.startsAt,
-      endsAt: new Date(
-        new Date(slot.startsAt).getTime() + serviceDurationMinutes * 60_000,
-      ).toISOString(),
-    }))
-    .filter((slot) => {
-      if (seenStarts.has(slot.startsAt)) return false;
-      seenStarts.add(slot.startsAt);
-      return true;
-    });
-}
-
-function filterCustomerBookableSlots(
-  slots: AvailableSlot[],
-  minStartMs: number,
-): AvailableSlot[] {
-  return slots.filter(
-    (slot) => new Date(slot.startsAt).getTime() >= minStartMs,
-  );
-}
-
 function dateInputRange(from: string, to: string): string[] {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
     return [];
@@ -506,42 +466,16 @@ export async function getAvailableSlotsForAdmin(
     });
 }
 
-/** Customer booking — same grid as admin, filtered by min lead time and booking window. */
+/** Customer booking — 15-minute slot grid within working windows, respects min lead time. */
 export async function getAvailableSlotsForCustomer(
   query: AdminSlotsQuery,
   constraints: SlotBookingConstraints = {},
 ): Promise<AvailableSlot[]> {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(query.date)) return [];
-  if (constraints.maxBookingDate && query.date > constraints.maxBookingDate) {
-    return [];
-  }
-
-  const service = await findServiceById(query.businessId, query.serviceId);
-  if (!service?.active) return [];
-
-  const staff = await findStaffById(query.businessId, query.staffMemberId);
-  if (!staff?.active) return [];
-
-  const calendarSlots = await listCalendarAvailableSlots(
-    {
-      businessId: query.businessId,
-      from: query.date,
-      to: query.date,
-      staffMemberId: query.staffMemberId,
-      excludeAppointmentId: query.excludeAppointmentId,
-    },
-    { includePast: true },
-  );
-
-  const minStartMs = minBookableStartMs(constraints.minHoursBefore);
-  return filterCustomerBookableSlots(
-    calendarRowsToCustomerSlots(
-      calendarSlots,
-      query.date,
-      service.duration_minutes,
-    ),
-    minStartMs,
-  );
+  return getAvailableSlots(query, {
+    minHoursBefore: constraints.minHoursBefore,
+    maxBookingDate: constraints.maxBookingDate,
+    includePast: false,
+  });
 }
 
 /** Dates in range that have at least one bookable slot for the customer. */
@@ -555,34 +489,26 @@ export async function getCustomerBookingDatesWithSlots(
   const staff = await findStaffById(query.businessId, query.staffMemberId);
   if (!staff?.active) return [];
 
-  const calendarSlots = await listCalendarAvailableSlots(
-    {
-      businessId: query.businessId,
-      from: query.from,
-      to: query.to,
-      staffMemberId: query.staffMemberId,
-    },
-    { includePast: true },
+  const maxDate = constraints.maxBookingDate;
+  const dates = dateInputRange(query.from, query.to).filter(
+    (date) => !maxDate || date <= maxDate,
   );
 
-  const minStartMs = minBookableStartMs(constraints.minHoursBefore);
-  const maxDate = constraints.maxBookingDate;
-  const dates = new Set<string>();
+  const results = await Promise.all(
+    dates.map(async (date) => {
+      const slots = await getAvailableSlots(
+        { ...query, date },
+        {
+          minHoursBefore: constraints.minHoursBefore,
+          maxBookingDate: constraints.maxBookingDate,
+          includePast: false,
+        },
+      );
+      return slots.length > 0 ? date : null;
+    }),
+  );
 
-  for (const date of dateInputRange(query.from, query.to)) {
-    if (maxDate && date > maxDate) continue;
-    const daySlots = filterCustomerBookableSlots(
-      calendarRowsToCustomerSlots(
-        calendarSlots,
-        date,
-        service.duration_minutes,
-      ),
-      minStartMs,
-    );
-    if (daySlots.length > 0) dates.add(date);
-  }
-
-  return [...dates].sort();
+  return results.filter((date): date is string => date !== null).sort();
 }
 
 export function maxBookingDateString(
