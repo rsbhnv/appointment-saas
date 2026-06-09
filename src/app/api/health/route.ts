@@ -13,10 +13,8 @@ export async function GET() {
   return NextResponse.json({
     status: "ok",
     timestamp: new Date().toISOString(),
-    sms: {
-      demoMode: isDemoMode,
-      twilioConfigured: isTwilioConfigured(),
-      supabaseAdminConfigured: isSupabaseAdminConfigured,
-    },
+    twilioConfigured: isTwilioConfigured(),
+    supabaseAdminConfigured: isSupabaseAdminConfigured,
+    demoMode: isDemoMode,
   });
 }
